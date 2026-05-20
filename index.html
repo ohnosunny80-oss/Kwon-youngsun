@@ -642,9 +642,8 @@ function startWhisper(b){
       fd.append('file', blob, 'recording.webm');
       fd.append('model','whisper-1');
       fd.append('language','ko');
-      fetch('https://api.openai.com/v1/audio/transcriptions',{
+      fetch('https://white-morning-52ad.yourstoryup.workers.dev/',{
         method:'POST',
-        headers:{'Authorization':'Bearer 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'},
         body:fd
       }).then(function(r){return r.json();}).then(function(d){
         var text=d.text||'변환 실패';
