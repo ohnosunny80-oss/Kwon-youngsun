@@ -638,11 +638,10 @@ function startWhisper(b){
       stream.getTracks().forEach(function(t){t.stop();});
       /* Whisper API로 전송 */
       var blob=new Blob(audioChunks,{type:'audio/webm'});
-      var fd=new FormData();
-      fd.append('file', blob, 'recording.webm');
       fetch('https://white-morning-52ad.yourstoryup.workers.dev/',{
         method:'POST',
-        body:fd
+        headers:{'Content-Type':'audio/webm'},
+        body:blob
       }).then(function(r){return r.json();}).then(function(d){
         var text=d.text||'변환 실패';
         var ta=document.querySelector('.note-ta[data-b="'+b+'"]');
