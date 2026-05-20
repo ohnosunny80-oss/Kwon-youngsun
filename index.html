@@ -644,7 +644,7 @@ function startWhisper(b){
         body:blob
       }).then(function(r){return r.json();}).then(function(d){
         console.log('Whisper 응답:', JSON.stringify(d));
-        var text=d.text||(d.error?'오류: '+d.error:'변환 실패 (응답: '+JSON.stringify(d)+')');
+        var text=d.text||(d.error&&d.error.message?'오류: '+d.error.message:('응답: '+JSON.stringify(d)));
         var ta=document.querySelector('.note-ta[data-b="'+b+'"]');
         if(ta){
           ta.value=(ta.value?ta.value+'\n':'')+text;
