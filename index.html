@@ -640,8 +640,6 @@ function startWhisper(b){
       var blob=new Blob(audioChunks,{type:'audio/webm'});
       var fd=new FormData();
       fd.append('file', blob, 'recording.webm');
-      fd.append('model','whisper-1');
-      fd.append('language','ko');
       fetch('https://white-morning-52ad.yourstoryup.workers.dev/',{
         method:'POST',
         body:fd
