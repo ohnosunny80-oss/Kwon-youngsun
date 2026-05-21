@@ -748,6 +748,18 @@ function parseAll(xml,alias){
 }
 
 async function searchAll(alias){
+  // 로컬 서버가 실행 중이면 서버에서 정확한 그룹핑 결과 반환
+  if(useLocal){
+    try{
+      const r=await fetch(`${LOCAL}/search?word=${encodeURIComponent(alias)}`,
+        {signal:AbortSignal.timeout(30000)});
+      if(r.ok){
+        const groups=await r.json();
+        return{groups, fromServer:true};
+      }
+    }catch(e){useLocal=false;updateStatus(false);}
+  }
+  // 로컬 서버 없으면 기존 방식 (CORS 프록시)
   const all=[];
   for(const st of['R','A','C','F','G']){
     const url=`${SRC}?${new URLSearchParams({ServiceKey:KEY,word:alias,year:'0',numOfRows:'30',pageNo:'1',registerStatus:st})}`;
@@ -759,7 +771,7 @@ async function searchAll(alias){
   }
   const seen=new Set(),u=[];
   all.forEach(p=>{const k=p.rn_raw||p.an;if(k&&!seen.has(k)){seen.add(k);u.push(p);}});
-  return u;
+  return{groups:null, patents:u, fromServer:false};
 }
 
 // 출원인별 그룹핑 — 회사명 + 주소 + 특허수
@@ -889,8 +901,11 @@ function makeCard(p,idx,store){
     if(!claimStore[store]) claimStore[store]={};
     claimStore[store][idx]={c1,comps:cc2};
   } else {
-    claimHtml=`<div class="claim-wrap"><div class="slabel">📋 청구항 1항</div>
-      <div class="claim-box" id="cl${store}${idx}"><div class="claim-loading">⏳ 불러오는 중...</div></div></div>`;
+    claimHtml=`<div class="claim-wrap"><div class="slabel">📋 청구항 1항 <span style="font-weight:400;font-size:10px;text-transform:none;color:var(--amber)">— Python 스크립트로 조회 시 포함됩니다</span></div>
+      <div class="claim-box" id="cl${store}${idx}" style="background:#fff9db;border-color:var(--amber-bd);color:var(--text2);font-style:italic;font-size:12px">
+        청구항 정보가 없습니다.<br>
+        kipris_final_v10.py 실행 후 JSON을 다시 업로드하면 청구항이 포함됩니다.
+      </div></div>`;
   }
   const effHtml=eff?`<div class="effect-wrap"><div class="slabel">💡 발명의 효과</div>
     <div class="effect-box">${eff}</div></div>`:'';
@@ -928,7 +943,16 @@ async function loadClaimLive(p,idx,store){
   const clEl=document.getElementById(`cl${store}${idx}`);
   const cclBtn=document.getElementById(`ccl${store}${idx}`);
   if(!clEl)return;
-  const{c1,eff}=await fetchClaim(p.an);
+  // 로컬 서버에서 청구항 조회
+  let c1='',eff='';
+  if(useLocal&&p.an){
+    try{
+      const r=await fetch(`${LOCAL}/claim?appNo=${encodeURIComponent(p.an)}`,
+        {signal:AbortSignal.timeout(15000)});
+      if(r.ok){const d=await r.json();c1=d.claim1||'';eff=d.effect||'';}
+    }catch(e){}
+  }
+  if(!c1){const res=await fetchClaim(p.an);c1=res.c1;eff=res.eff;}
   if(!claimStore[store])claimStore[store]={};
   claimStore[store][idx]={c1,comps:[]};
   if(c1){
@@ -974,27 +998,70 @@ async function doSearch(){
     <div style="font-size:12px;color:var(--text2)">등록·출원·소멸·포기 전체 검색 중</div>
   </div>`;
   try{
-    const patents=await searchAll(alias);
-    if(!patents.length){
+    const result=await searchAll(alias);
+
+    let groups=[];
+    if(result.fromServer){
+      // 로컬 서버: 이미 정확하게 필터링된 그룹 반환
+      groups=result.groups||[];
+      // 서버 데이터를 앱 형식으로 변환
+      groups=groups.map(g=>({
+        name:g.name,
+        address:g.address||'',
+        patents:g.patents.map(p=>({
+          ...p,
+          st:p.status, rd:p.reg_date, ad:p.app_date,
+          exp:p.expire_date||'-',
+          dl:p.procurement_deadline||'-',
+          yrs:p.years_passed,
+          new7:p.is_new_7yr||false,
+          can_use:p.can_use||false,
+          abs:p.abstract||'',
+          inv:p.inventor||'',
+          rn_raw:p.reg_no_raw||'',
+          an:p.app_no||'',
+          appl:p.appl||g.name,
+          addr:p.addr||g.address||'',
+          right_label:'등록권자(RG)',
+          procurement_note:p.can_use?'✅ 조달 활용 가능':
+            p.status==='출원'?'⚠ 출원중':`❌ ${p.status}`,
+        })),
+        yr7:g.yr7||0,
+        reg:g.reg||0,
+        app:g.app||0,
+      }));
+    } else {
+      // CORS 프록시: 기존 방식
+      const patents=result.patents||[];
+      if(!patents.length){
+        document.getElementById('area').innerHTML=`<div class="empty">
+          <div style="font-size:36px;opacity:.3;margin-bottom:10px">🔍</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">"${alias}" — 특허 없음</div>
+          <div style="font-size:12px;line-height:1.8">
+            로컬 서버(<code>py kipris_server.py</code>)를 실행하면 더 정확하게 조회됩니다.
+          </div>
+        </div>`;
+        return;
+      }
+      groups=groupByApplicant(patents);
+    }
+
+    if(!groups.length){
       document.getElementById('area').innerHTML=`<div class="empty">
         <div style="font-size:36px;opacity:.3;margin-bottom:10px">🔍</div>
         <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">"${alias}" — 특허 없음</div>
         <div style="font-size:12px;line-height:1.8">
-          KIPRIS 출원인명과 일치하지 않을 수 있습니다.<br>
+          KIPRIS에 등록된 출원인명과 일치하지 않을 수 있습니다.<br>
           법인명 앞뒤 '주식회사', '(주)', '㈜' 등을 제외한 핵심 상호만 입력해 보세요.
         </div>
       </div>`;
       return;
     }
 
-    // 출원인별 그룹핑
-    const groups=groupByApplicant(patents);
-
-    // 출원인이 1개면 바로 표시, 여러 개면 선택 UI
     if(groups.length===1){
-      showPatentResults(groups[0].patents, alias);
+      showPatentResults(groups[0].patents, groups[0].name, groups[0].address);
     } else {
-      showApplicantPicker(groups, alias, patents);
+      showApplicantPicker(groups, alias);
     }
   }catch(e){
     document.getElementById('area').innerHTML=`<div style="background:var(--red-bg);border:1px solid var(--red-bd);border-radius:var(--r);padding:16px;color:var(--red);margin-top:16px">오류: ${e.message}</div>`;
@@ -1038,7 +1105,7 @@ function showApplicantPicker(groups, alias, allPatents){
 function selectApplicant(idx){
   const g=window._searchGroups[idx];
   if(!g)return;
-  showPatentResults(g.patents, g.name);
+  showPatentResults(g.patents, g.name, g.address||'');
 }
 
 async function showPatentResults(patents, label){
