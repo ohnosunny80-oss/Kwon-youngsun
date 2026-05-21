@@ -98,7 +98,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#1a
 .ctype{font-size:10px;padding:1px 6px;border-radius:99px;background:#ffebee;color:#b71c1c;font-weight:700;display:inline-block}
 .cprod{font-size:12px;font-weight:700;color:#111;margin:4px 0 2px;line-height:1.4}
 .cdet{font-size:10px;color:#aaa;line-height:1.7;font-family:monospace}
-.note-ta{width:100%;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;padding:10px 12px;resize:vertical;min-height:120px;max-height:600px;overflow-y:auto;line-height:1.8;font-family:inherit;outline:none;color:#111;transition:height 0.2s}
+.note-ta{width:100%;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;padding:10px 12px;resize:vertical;min-height:120px;overflow:hidden;line-height:1.8;font-family:inherit;outline:none;color:#111;transition:height 0.2s}
 .note-ta:focus{border-color:#b71c1c}
 .onote{margin-top:6px;padding:8px 10px;border-radius:7px;font-size:11px}
 .nodata{font-size:11px;color:#ccc;font-style:italic;padding:4px 0}
@@ -615,68 +615,74 @@ function startWhisper(b){
   var btn=document.getElementById('whisper-btn-'+b);
   var ta=document.querySelector('.note-ta[data-b="'+b+'"]');
 
+  /* 중지 */
   if(isRecording){
     isRecording=false;
-    if(mediaRec&&mediaRec.state==='recording') mediaRec.stop();
     btn.textContent='🎙 녹음 시작 → AI 자동 변환';
     btn.style.background='#4caf50';
+    btn.style.color='#fff';
     return;
   }
 
   navigator.mediaDevices.getUserMedia({audio:true,video:false}).then(function(stream){
     isRecording=true;
-    var fullText=ta.value||'';
     var segNum=0;
 
-    btn.textContent='⏹ 녹음 중 (탭하면 종료)';
+    btn.textContent='⏹ 녹음 중... (탭하면 종료)';
     btn.style.background='#f44336';
     btn.style.color='#fff';
 
-    function recordSegment(){
+    function sendChunk(chunks){
+      if(chunks.length===0){
+        if(isRecording) nextSeg();
+        return;
+      }
+      segNum++;
+      var blob=new Blob(chunks,{type:'audio/webm'});
+      fetch('https://white-morning-52ad.yourstoryup.workers.dev/',{
+        method:'POST',
+        headers:{'Content-Type':'audio/webm'},
+        body:blob
+      }).then(function(r){return r.json();})
+      .then(function(d){
+        if(d.text){
+          var cur=ta.value;
+          ta.value=cur+(cur?'\n':'')+d.text;
+          /* 높이 자동 조절 - 스크롤 없이 늘어남 */
+          ta.style.height='auto';
+          ta.style.height=ta.scrollHeight+'px';
+          saveNote(b,ta.value);
+        }
+        if(isRecording){
+          btn.textContent='⏹ 녹음 중 '+segNum+'번째 완료 (탭하면 종료)';
+          nextSeg();
+        } else {
+          btn.textContent='🎙 녹음 시작 → AI 자동 변환';
+          btn.style.background='#4caf50';
+          stream.getTracks().forEach(function(t){t.stop();});
+        }
+      }).catch(function(){
+        if(isRecording) nextSeg();
+      });
+    }
+
+    function nextSeg(){
       if(!isRecording) return;
       var chunks=[];
       var rec=new MediaRecorder(stream);
-      rec.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
-      rec.onstop=function(){
-        if(chunks.length===0){if(isRecording)recordSegment();return;}
-        segNum++;
-        btn.textContent='⏳ '+segNum+'번째 변환 중...';
-        var blob=new Blob(chunks,{type:'audio/webm'});
-        fetch('https://white-morning-52ad.yourstoryup.workers.dev/',{
-          method:'POST',
-          headers:{'Content-Type':'audio/webm'},
-          body:blob
-        }).then(function(r){return r.json();})
-        .then(function(d){
-          if(d.text){
-            fullText+=(fullText?'\n':'')+d.text;
-            ta.value=fullText;
-            ta.style.height='auto';
-            ta.style.height=Math.min(ta.scrollHeight,600)+'px';
-            ta.scrollTop=ta.scrollHeight;
-            saveNote(b,fullText);
-          }
-          if(isRecording){
-            btn.textContent='⏹ 녹음 중 (탭하면 종료) - '+segNum+'번 완료';
-            recordSegment();
-          } else {
-            btn.textContent='🎙 녹음 시작 → AI 자동 변환';
-            btn.style.background='#4caf50';
-            stream.getTracks().forEach(function(t){t.stop();});
-          }
-        }).catch(function(){
-          if(isRecording) recordSegment();
-        });
-      };
+      mediaRec=rec;
+      rec.ondataavailable=function(e){if(e.data&&e.data.size>0)chunks.push(e.data);};
+      rec.onstop=function(){sendChunk(chunks);};
       rec.start();
       setTimeout(function(){
         if(rec.state==='recording') rec.stop();
       },30000);
     }
 
-    recordSegment();
+    nextSeg();
 
   }).catch(function(){
+    isRecording=false;
     alert('마이크 권한을 허용해주세요.');
   });
 }
