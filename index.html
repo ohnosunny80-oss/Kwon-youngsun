@@ -615,30 +615,36 @@ function startWhisper(b){
   var btn=document.getElementById('whisper-btn-'+b);
   var ta=document.querySelector('.note-ta[data-b="'+b+'"]');
 
-  /* 중지 */
   if(isRecording){
+    /* 녹음 중지 → 전송 */
     isRecording=false;
-    btn.textContent='🎙 녹음 시작 → AI 자동 변환';
-    btn.style.background='#4caf50';
-    btn.style.color='#fff';
+    if(mediaRec&&mediaRec.state==='recording'){
+      mediaRec.stop();
+    }
     return;
   }
 
   navigator.mediaDevices.getUserMedia({audio:true,video:false}).then(function(stream){
+    var allChunks=[];
     isRecording=true;
-    var segNum=0;
 
-    btn.textContent='⏹ 녹음 중... (탭하면 종료)';
-    btn.style.background='#f44336';
-    btn.style.color='#fff';
+    mediaRec=new MediaRecorder(stream);
+    mediaRec.ondataavailable=function(e){
+      if(e.data&&e.data.size>0) allChunks.push(e.data);
+    };
+    mediaRec.onstop=function(){
+      stream.getTracks().forEach(function(t){t.stop();});
+      isRecording=false;
+      btn.textContent='⏳ AI 변환 중...';
+      btn.style.background='#ff9800';
 
-    function sendChunk(chunks){
-      if(chunks.length===0){
-        if(isRecording) nextSeg();
+      if(allChunks.length===0){
+        btn.textContent='🎙 녹음 시작 → AI 자동 변환';
+        btn.style.background='#4caf50';
         return;
       }
-      segNum++;
-      var blob=new Blob(chunks,{type:'audio/webm'});
+
+      var blob=new Blob(allChunks,{type:'audio/webm'});
       fetch('https://white-morning-52ad.yourstoryup.workers.dev/',{
         method:'POST',
         headers:{'Content-Type':'audio/webm'},
@@ -648,38 +654,24 @@ function startWhisper(b){
         if(d.text){
           var cur=ta.value;
           ta.value=cur+(cur?'\n':'')+d.text;
-          /* 높이 자동 조절 - 스크롤 없이 늘어남 */
           ta.style.height='auto';
           ta.style.height=ta.scrollHeight+'px';
           saveNote(b,ta.value);
         }
-        if(isRecording){
-          btn.textContent='⏹ 녹음 중 '+segNum+'번째 완료 (탭하면 종료)';
-          nextSeg();
-        } else {
-          btn.textContent='🎙 녹음 시작 → AI 자동 변환';
-          btn.style.background='#4caf50';
-          stream.getTracks().forEach(function(t){t.stop();});
-        }
-      }).catch(function(){
-        if(isRecording) nextSeg();
+        btn.textContent='🎙 녹음 시작 → AI 자동 변환';
+        btn.style.background='#4caf50';
+        btn.style.color='#fff';
+      }).catch(function(e){
+        btn.textContent='🎙 녹음 시작 → AI 자동 변환';
+        btn.style.background='#4caf50';
+        alert('변환 실패: '+e.message);
       });
-    }
+    };
 
-    function nextSeg(){
-      if(!isRecording) return;
-      var chunks=[];
-      var rec=new MediaRecorder(stream);
-      mediaRec=rec;
-      rec.ondataavailable=function(e){if(e.data&&e.data.size>0)chunks.push(e.data);};
-      rec.onstop=function(){sendChunk(chunks);};
-      rec.start();
-      setTimeout(function(){
-        if(rec.state==='recording') rec.stop();
-      },30000);
-    }
-
-    nextSeg();
+    mediaRec.start(1000); /* 1초마다 데이터 수집 */
+    btn.textContent='⏹ 녹음 중... (탭하면 변환)';
+    btn.style.background='#f44336';
+    btn.style.color='#fff';
 
   }).catch(function(){
     isRecording=false;
