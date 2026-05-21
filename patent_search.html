@@ -705,10 +705,27 @@ async function searchAll(alias){
   }
   const seen=new Set(),u=[];
   all.forEach(p=>{const k=p.rn_raw||p.an;if(k&&!seen.has(k)){seen.add(k);u.push(p);}});
-  // 출원인 그룹핑
+  // 출원인 엄격 필터링 — 검색어가 출원인명에 포함된 것만
   const nb=normName(alias);
-  const filtered=u.filter(p=>normName(p.appl).includes(nb)||nb.includes(normName(p.appl)));
-  const result=filtered.length>0?filtered:u;
+  // 1차: 정규화된 출원인명에 검색어 포함
+  const filtered=u.filter(p=>{
+    const na=normName(p.appl);
+    return na.includes(nb) || nb.includes(na);
+  });
+  // 2차: 짬뽕 방지 — 가장 많이 나온 출원인 그룹만 선택
+  if(filtered.length>0){
+    const cnt={};
+    filtered.forEach(p=>{cnt[p.appl]=(cnt[p.appl]||0)+1;});
+    const topAppl=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0][0];
+    const topNorm=normName(topAppl);
+    // topAppl과 유사한 출원인만 포함
+    var result=filtered.filter(p=>normName(p.appl)===topNorm||
+      normName(p.appl).includes(nb)&&normName(p.appl).length<=nb.length+6);
+    if(result.length===0) result=filtered.filter(p=>p.appl===topAppl);
+    if(result.length===0) result=filtered;
+  } else {
+    var result=[];  // 매칭 없으면 빈 배열 — 특허없음 표시
+  }
   result.sort((a,b)=>{
     const sp={등록:0,출원:1,'소멸/만료':2,포기:3,거절:4};
     if(a.new7!==b.new7)return a.new7?-1:1;
