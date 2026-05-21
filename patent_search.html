@@ -683,9 +683,10 @@ function parseAll(xml,alias){
       else if(rs.includes('거절'))st='거절';
       const dates=calcDates(rd);
       let fno=rn;if(rn.length===13)fno=`10-${rn.slice(2,9)}-${rn.slice(9)}`;
+      const addr=g('applicantAddress');
       list.push({st,title:g('inventionTitle'),reg_no:fno,rn_raw:rn,an,
         rd:fd(rd),ad:fd(ad),exp:dates.exp,yrs:dates.yrs,new7:dates.new7,dl:dates.dl,
-        abs:g('astrtCont'),appl,inv:g('inventorName'),ipc:g('ipcNumber'),
+        abs:g('astrtCont'),appl,addr,inv:g('inventorName'),ipc:g('ipcNumber'),
         right_label:'출원인(AP)',can_use:st==='등록'&&dates.new7,
         procurement_note:st==='등록'&&dates.new7?'✅ 조달 활용 가능':st==='출원'?'⚠ 출원중':`❌ ${st}`});
     });
@@ -705,34 +706,39 @@ async function searchAll(alias){
   }
   const seen=new Set(),u=[];
   all.forEach(p=>{const k=p.rn_raw||p.an;if(k&&!seen.has(k)){seen.add(k);u.push(p);}});
-  // 출원인 엄격 필터링 — 검색어가 출원인명에 포함된 것만
-  const nb=normName(alias);
-  // 1차: 정규화된 출원인명에 검색어 포함
-  const filtered=u.filter(p=>{
-    const na=normName(p.appl);
-    return na.includes(nb) || nb.includes(na);
+  return u;
+}
+
+// 출원인별 그룹핑 — 회사명 + 주소 + 특허수
+function groupByApplicant(patents){
+  const groups={};
+  patents.forEach(p=>{
+    const key=p.appl||'미상';
+    if(!groups[key]){
+      groups[key]={
+        name:key,
+        address:p.addr||'',
+        patents:[],
+        yr7:0, reg:0, app:0
+      };
+    }
+    groups[key].patents.push(p);
+    if(p.st==='등록') groups[key].reg++;
+    if(p.st==='출원') groups[key].app++;
+    if(p.new7&&p.st==='등록') groups[key].yr7++;
+    if(!groups[key].address && p.addr) groups[key].address=p.addr;
   });
-  // 2차: 짬뽕 방지 — 가장 많이 나온 출원인 그룹만 선택
-  if(filtered.length>0){
-    const cnt={};
-    filtered.forEach(p=>{cnt[p.appl]=(cnt[p.appl]||0)+1;});
-    const topAppl=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0][0];
-    const topNorm=normName(topAppl);
-    // topAppl과 유사한 출원인만 포함
-    var result=filtered.filter(p=>normName(p.appl)===topNorm||
-      normName(p.appl).includes(nb)&&normName(p.appl).length<=nb.length+6);
-    if(result.length===0) result=filtered.filter(p=>p.appl===topAppl);
-    if(result.length===0) result=filtered;
-  } else {
-    var result=[];  // 매칭 없으면 빈 배열 — 특허없음 표시
-  }
-  result.sort((a,b)=>{
-    const sp={등록:0,출원:1,'소멸/만료':2,포기:3,거절:4};
+  // 특허수 내림차순 정렬
+  return Object.values(groups).sort((a,b)=>b.patents.length-a.patents.length);
+}
+
+function sortPatents(patents){
+  const sp={등록:0,출원:1,'소멸/만료':2,포기:3,거절:4};
+  return [...patents].sort((a,b)=>{
     if(a.new7!==b.new7)return a.new7?-1:1;
     if(sp[a.st]!==sp[b.st])return sp[a.st]-sp[b.st];
     return(b.rd||b.ad||'').localeCompare(a.rd||a.ad||'');
   });
-  return result;
 }
 
 async function fetchClaim(an){
@@ -922,42 +928,102 @@ async function doSearch(){
         <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">"${alias}" — 특허 없음</div>
         <div style="font-size:12px;line-height:1.8">
           KIPRIS 출원인명과 일치하지 않을 수 있습니다.<br>
-          법인명 앞뒤 '주식회사', '(주)', '㈜' 등을 제외한 핵심 상호만 입력해 보세요.<br>
-          더 정확한 조회는 <strong>Python 스크립트</strong>를 사용하세요.
+          법인명 앞뒤 '주식회사', '(주)', '㈜' 등을 제외한 핵심 상호만 입력해 보세요.
         </div>
       </div>`;
       return;
     }
-    const yr7=patents.filter(p=>p.new7&&p.st==='등록');
-    const app=patents.filter(p=>p.st==='출원');
-    const exp=patents.filter(p=>['소멸/만료','포기','거절'].includes(p.st));
-    const reg=patents.filter(p=>p.st==='등록');
-    document.getElementById('area').innerHTML=`
-      <div style="margin:16px 0 14px">
-        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px">"${alias}" 특허 현황</div>
-        <div style="font-size:11px;color:var(--text3)">KIPRIS 실시간 · ${new Date().toLocaleDateString('ko-KR')} · 총 ${patents.length}건</div>
-      </div>
-      <div class="summary-row">
-        <div class="scard"><div class="scard-n ng">${yr7.length}</div><div class="scard-l">7년미만 조달유력</div></div>
-        <div class="scard"><div class="scard-n nb">${reg.length}</div><div class="scard-l">등록 특허</div></div>
-        <div class="scard"><div class="scard-n na">${app.length}</div><div class="scard-l">출원중</div></div>
-        <div class="scard"><div class="scard-n ngray">${exp.length}</div><div class="scard-l">소멸/만료</div></div>
-      </div>
-      <div class="status-bar" id="sbar"><span class="sdot"></span> 청구항 1항 불러오는 중...</div>
-      <div id="pcont">${patents.map((p,i)=>makeCard(p,i,'live')).join('')}</div>`;
-    const targets=patents.filter(p=>p.st==='등록'||p.st==='출원');
-    for(let i=0;i<targets.length;i++){
-      const p=targets[i];const idx=patents.indexOf(p);
-      const sb=document.getElementById('sbar');
-      if(sb)sb.innerHTML=`<span class="sdot"></span> 청구항 ${i+1}/${targets.length} — ${p.title.slice(0,30)}...`;
-      await loadClaimLive(p,idx,'live');
-      await new Promise(r=>setTimeout(r,400));
+
+    // 출원인별 그룹핑
+    const groups=groupByApplicant(patents);
+
+    // 출원인이 1개면 바로 표시, 여러 개면 선택 UI
+    if(groups.length===1){
+      showPatentResults(groups[0].patents, alias);
+    } else {
+      showApplicantPicker(groups, alias, patents);
     }
-    const sb=document.getElementById('sbar');
-    if(sb){sb.style.color='var(--green)';sb.innerHTML='✅ 청구항 1항 로드 완료';}
   }catch(e){
     document.getElementById('area').innerHTML=`<div style="background:var(--red-bg);border:1px solid var(--red-bd);border-radius:var(--r);padding:16px;color:var(--red);margin-top:16px">오류: ${e.message}</div>`;
   }finally{btn.disabled=false;btn.textContent='특허 조회';}
+}
+
+// 출원인 선택 UI
+function showApplicantPicker(groups, alias, allPatents){
+  const html=`
+    <div style="margin:16px 0 12px">
+      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px">"${alias}" 검색 결과 — 출원인을 선택하세요</div>
+      <div style="font-size:12px;color:var(--text2)">${groups.length}개 출원인이 검색됐습니다. 조회할 회사를 선택해 주세요.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      ${groups.map((g,i)=>`
+        <div class="appl-card" onclick="selectApplicant(${i})" style="background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:14px">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--blue-bg);border:1.5px solid var(--blue-bd);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--blue);flex-shrink:0">${g.yr7>0?'★':'○'}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">${g.name}</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${g.address||'주소 정보 없음'}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              ${g.yr7>0?`<span style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">✓ 7년미만 ${g.yr7}건</span>`:''}
+              <span style="background:#f1f3f5;color:var(--text2);border:1px solid var(--border);border-radius:99px;padding:2px 8px;font-size:10px">등록 ${g.reg}건</span>
+              ${g.app>0?`<span style="background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd);border-radius:99px;padding:2px 8px;font-size:10px">출원 ${g.app}건</span>`:''}
+              <span style="background:#f1f3f5;color:var(--text3);border-radius:99px;padding:2px 8px;font-size:10px">전체 ${g.patents.length}건</span>
+            </div>
+          </div>
+          <div style="font-size:20px;color:var(--text3);flex-shrink:0">›</div>
+        </div>`).join('')}
+    </div>`;
+  document.getElementById('area').innerHTML=html;
+  // 카드 hover 효과
+  document.querySelectorAll('.appl-card').forEach(card=>{
+    card.addEventListener('mouseenter',()=>{card.style.borderColor='var(--blue)';card.style.background='var(--blue-bg)';});
+    card.addEventListener('mouseleave',()=>{card.style.borderColor='var(--border)';card.style.background='#fff';});
+  });
+  // groups 저장
+  window._searchGroups=groups;
+}
+
+function selectApplicant(idx){
+  const g=window._searchGroups[idx];
+  if(!g)return;
+  showPatentResults(g.patents, g.name);
+}
+
+async function showPatentResults(patents, label){
+  const yr7=patents.filter(p=>p.new7&&p.st==='등록');
+  const app=patents.filter(p=>p.st==='출원');
+  const exp=patents.filter(p=>['소멸/만료','포기','거절'].includes(p.st));
+  const reg=patents.filter(p=>p.st==='등록');
+  const sorted=sortPatents(patents);
+  const addr=patents.find(p=>p.addr)?.addr||'';
+
+  document.getElementById('area').innerHTML=`
+    <div style="margin:16px 0 14px;display:flex;align-items:flex-start;gap:10px">
+      <button onclick="doSearch()" style="background:none;border:1px solid var(--border);border-radius:var(--rs);padding:5px 10px;font-size:12px;cursor:pointer;color:var(--text2);margin-top:3px">← 다시 선택</button>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px">${label}</div>
+        ${addr?`<div style="font-size:12px;color:var(--text2);margin-bottom:3px">📍 ${addr}</div>`:''}
+        <div style="font-size:11px;color:var(--text3)">KIPRIS 실시간 · ${new Date().toLocaleDateString('ko-KR')} · 총 ${patents.length}건</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <div class="scard"><div class="scard-n ng">${yr7.length}</div><div class="scard-l">7년미만 조달유력</div></div>
+      <div class="scard"><div class="scard-n nb">${reg.length}</div><div class="scard-l">등록 특허</div></div>
+      <div class="scard"><div class="scard-n na">${app.length}</div><div class="scard-l">출원중</div></div>
+      <div class="scard"><div class="scard-n ngray">${exp.length}</div><div class="scard-l">소멸/만료</div></div>
+    </div>
+    <div class="status-bar" id="sbar"><span class="sdot"></span> 청구항 1항 불러오는 중...</div>
+    <div id="pcont">${sorted.map((p,i)=>makeCard(p,i,'live')).join('')}</div>`;
+
+  const targets=sorted.filter(p=>p.st==='등록'||p.st==='출원');
+  for(let i=0;i<targets.length;i++){
+    const p=targets[i];const idx=sorted.indexOf(p);
+    const sb=document.getElementById('sbar');
+    if(sb)sb.innerHTML=`<span class="sdot"></span> 청구항 ${i+1}/${targets.length} — ${p.title.slice(0,30)}...`;
+    await loadClaimLive(p,idx,'live');
+    await new Promise(r=>setTimeout(r,400));
+  }
+  const sb=document.getElementById('sbar');
+  if(sb){sb.style.color='var(--green)';sb.innerHTML='✅ 청구항 1항 로드 완료';}
 }
 
 // ── JSON 업로드 ──────────────────────────────────
