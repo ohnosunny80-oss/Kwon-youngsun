@@ -903,6 +903,19 @@ function copyText(text,el){
 }
 
 function makeCard(p,idx,store){
+  // JSON 필드 정규화 (긴 키 → 짧은 키)
+  if(!p.st && p.patent_status) p.st = p.patent_status;
+  if(!p.rd && p.reg_date) p.rd = p.reg_date;
+  if(!p.ad && p.app_date) p.ad = p.app_date;
+  if(!p.exp && p.expire_date) p.exp = p.expire_date;
+  if(!p.dl && p.procurement_deadline) p.dl = p.procurement_deadline;
+  if(p.yrs==null && p.years_passed!=null) p.yrs = p.years_passed;
+  if(!p.new7 && p.is_new_7yr) p.new7 = p.is_new_7yr;
+  if(!p.an && p.app_no) p.an = p.app_no;
+  if(!p.appl && p.applicant) p.appl = p.applicant;
+  if(!p.inv && p.inventor) p.inv = p.inventor;
+  if(!p.abs && p.abstract) p.abs = p.abstract;
+
   const usable=p.can_use||(p.st==='등록'&&p.new7);
   const isApp=p.st==='출원';
   const isExp=['소멸/만료','포기','거절'].includes(p.st);
@@ -931,8 +944,7 @@ function makeCard(p,idx,store){
 
   let claimHtml='';
   if(c1){
-    const{comps:cc2,tests:tt}=analyzeComp(c1);
-    const{comps:cc2,tests:tt2}=analyzeComp(c1);
+    const{comps:cc2,keywords:kws2,tests:tt2}=analyzeComp(c1);
     const compHtml=cc2.length?`
       <div style="margin-bottom:14px">
         <div class="slabel">🔵 핵심 구성요소 <span style="font-weight:400;font-size:10px;text-transform:none;color:var(--text3)">(세미콜론 기준 자동 분리)</span></div>
