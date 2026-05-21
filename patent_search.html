@@ -201,6 +201,9 @@ body{background:#f8f9fa;color:var(--text);font-family:var(--font);font-size:13px
 </div>
 
 <!-- 탭 -->
+<div id="auto-load-status" style="background:#fff;border-bottom:1px solid var(--border);padding:8px 24px;font-size:12px;text-align:center">
+  <span style="color:var(--text3)">⏳ 특허 데이터 불러오는 중...</span>
+</div>
 <div class="tabs">
   <div class="tab active" onclick="switchTab('guide')">📖 사용 가이드</div>
   <div class="tab" onclick="switchTab('search')">🔍 실시간 검색</div>
@@ -1291,6 +1294,48 @@ function showCompanyJson(name){
 }
 
 document.getElementById('inp')?.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+
+// ── GitHub JSON 자동 로드 ──────────────────────────
+const GITHUB_JSON = 'https://raw.githubusercontent.com/ohnosunny80-oss/Kwon-youngsun/main/patent_results.json';
+
+async function autoLoadJson(){
+  const statusEl = document.getElementById('auto-load-status');
+  try {
+    if(statusEl) statusEl.innerHTML = '<span style="color:var(--amber)">⏳ 특허 데이터 불러오는 중...</span>';
+    const r = await fetch(GITHUB_JSON + '?t=' + Date.now());
+    if(!r.ok) throw new Error('fetch fail');
+    const data = await r.json();
+    jsonData = data;
+    const withP = data.filter(d=>d.patents&&d.patents.length>0);
+
+    // 업로드 영역 업데이트
+    const dropZone = document.getElementById('drop-zone');
+    if(dropZone) dropZone.innerHTML = `
+      <div style="font-size:14px;font-weight:600;color:var(--green);margin-bottom:4px">✅ 특허 데이터 자동 로드 완료</div>
+      <div style="font-size:12px;color:var(--text2)">${data.length}개사 · 특허있는 업체 ${withP.length}개사</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">최신 데이터로 업데이트하려면 patent_results.json을 GitHub에 올려주세요</div>`;
+
+    // 업체 선택 버튼 표시
+    document.getElementById('co-picker-wrap').style.display='block';
+    document.getElementById('co-picker').innerHTML = withP.map(d=>`
+      <div class="co-btn" onclick="showCompanyJson('${d.name.replace(/'/g,"\'")}')">
+        <div class="co-btn-name">${d.name}</div>
+        <div class="co-btn-sub">특허 ${d.summary?.전체||d.patents.length}건 · 7년미만 ${d.summary?.['7년미만']||d.summary?.조달활용||0}건</div>
+      </div>`).join('');
+
+    if(statusEl) statusEl.innerHTML = '<span style="color:var(--green)">✅ 특허 데이터 로드 완료 — 업체를 클릭하세요</span>';
+
+    // JSON 업로드 탭으로 자동 이동
+    switchTab('upload');
+
+  } catch(e) {
+    if(statusEl) statusEl.innerHTML = '<span style="color:var(--text3)">데이터 없음 — JSON을 직접 업로드하세요</span>';
+    console.log('자동 로드 실패:', e.message);
+  }
+}
+
+// 페이지 로드 시 자동 실행
+autoLoadJson();
 </script>
 </body>
 </html>
