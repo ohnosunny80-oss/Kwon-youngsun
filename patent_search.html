@@ -260,7 +260,7 @@ function parsePatents(xml, alias){
     doc.querySelectorAll('item').forEach(it=>{
       const g=t=>it.querySelector(t)?.textContent?.trim()||'';
       const appl=g('applicantName');
-      if(!appl.includes(alias)) return;
+      // 필터 없음 — 출원인 그룹핑은 searchAll에서 처리
       const rn=g('registerNumber'), rd=g('registerDate');
       const an=g('applicationNumber'), ad=g('applicationDate');
       const rs=g('registerStatus');
@@ -279,6 +279,13 @@ function parsePatents(xml, alias){
   }catch(e){return {list:[],err:'파싱오류'};}
 }
 
+function normName(s){
+  return (s||'').replace(/[\(\)（）\s]/g,'')
+    .replace(/주식회사|㈜|\/주|\.주/g,'')
+    .replace(/[a-z]/g,c=>c.toUpperCase())
+    .toLowerCase();
+}
+
 async function searchAll(alias){
   const all=[];
   for(const st of ['R','A','C','F','G']){
@@ -289,15 +296,46 @@ async function searchAll(alias){
     if(list) all.push(...list);
     await new Promise(r=>setTimeout(r,300));
   }
-  const seen=new Set(),u=[];
-  all.forEach(p=>{const k=p.rn_raw||p.an; if(k&&!seen.has(k)){seen.add(k);u.push(p);}});
-  u.sort((a,b)=>{
+
+  // 중복 제거
+  const seen=new Set(),all2=[];
+  all.forEach(p=>{const k=p.rn_raw||p.an; if(k&&!seen.has(k)){seen.add(k);all2.push(p);}});
+
+  if(!all2.length) return [];
+
+  // 출원인명 그룹핑 — 검색어와 가장 유사한 출원인 자동 선택
+  const nb=normName(alias);
+  const applCount={};
+  all2.forEach(p=>{
+    const key=p.appl||'';
+    applCount[key]=(applCount[key]||0)+1;
+  });
+
+  // 정규화된 이름이 검색어를 포함하거나, 검색어가 정규화된 이름을 포함하는 출원인 찾기
+  let bestAppl=null, bestScore=0;
+  Object.keys(applCount).forEach(appl=>{
+    const na=normName(appl);
+    let score=0;
+    if(na.includes(nb)||nb.includes(na)) score=100+applCount[appl];
+    else if(na.includes(nb.slice(0,Math.floor(nb.length*0.7)))) score=50+applCount[appl];
+    if(score>bestScore){bestScore=score;bestAppl=appl;}
+  });
+
+  // 매칭 출원인이 있으면 그것만, 없으면 전체 (노이즈 포함이지만 일단 보여줌)
+  const filtered = bestAppl
+    ? all2.filter(p=>p.appl===bestAppl || normName(p.appl).includes(nb) || nb.includes(normName(p.appl)))
+    : all2;
+
+  // 매칭 결과가 너무 적으면 검색어 포함된 모든 출원인 포함
+  const result = filtered.length>0 ? filtered : all2;
+
+  result.sort((a,b)=>{
     const sp={등록:0,출원:1,'소멸/만료':2,포기:3,거절:4};
     if(a.new7!==b.new7) return a.new7?-1:1;
     if(sp[a.st]!==sp[b.st]) return sp[a.st]-sp[b.st];
     return (b.rd||b.ad||'').localeCompare(a.rd||a.ad||'');
   });
-  return u;
+  return result;
 }
 
 async function fetchClaim(an){
@@ -386,6 +424,7 @@ function makeCard(p,idx){
       <div class="mitem"><div class="mlabel">출원일</div><div class="mval">${p.ad||'-'}</div></div>
       <div class="mitem"><div class="mlabel">경과년수</div><div class="mval">${p.yrs!=null?p.yrs+'년 경과':'-'}</div></div>
       <div class="mitem"><div class="mlabel">조달 활용기한</div><div class="mval ${usable?'vg':'va'}">${p.dl||'-'}</div></div>
+      ${p.appl?`<div class="mitem"><div class="mlabel">출원인/권리자</div><div class="mval" style="font-size:11px">${p.appl}</div></div>`:''}
       ${p.inv?`<div class="mitem"><div class="mlabel">발명자</div><div class="mval">${p.inv}</div></div>`:''}
       ${p.ipc?`<div class="mitem"><div class="mlabel">IPC 분류</div><div class="mval" style="font-size:11px">${p.ipc.slice(0,50)}</div></div>`:''}
     </div>
