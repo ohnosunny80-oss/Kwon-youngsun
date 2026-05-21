@@ -343,6 +343,13 @@ body{background:#f8f9fa;color:var(--text);font-family:var(--font);font-size:13px
 <!-- TAB 2: 실시간 검색 -->
 <div id="tab-search" class="tab-panel">
 <div class="search-section">
+  <div id="server-status" style="font-size:12px;padding:8px 0 12px;display:flex;align-items:center;gap:6px">
+    <span style="color:#adb5bd">● 로컬 서버 확인 중...</span>
+  </div>
+  <div style="background:#e7f5ff;border:1px solid #74c0fc;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;line-height:1.7">
+    <strong style="color:#1971c2">정확한 조회를 위해:</strong> CMD에서 <code style="background:#fff;padding:1px 5px;border-radius:3px;font-size:11px">py kipris_server.py</code> 실행 후 사용하세요.
+    로컬 서버 없이도 CORS 프록시로 조회되지만 불안정할 수 있습니다.
+  </div>
   <div class="stitle">실시간 특허 검색</div>
   <div class="sdesc">
     기업명을 입력하면 KIPRIS에서 실시간으로 조회합니다. (출원인 기준)<br>
@@ -616,6 +623,8 @@ if __name__ == "__main__":
 
 // ── KIPRIS API (실시간 검색) ─────────────────────
 const KEY = 'Mk1YvlvbqQGzVQDXukYLom7nD5U3wVkD15K5nUxCwI0=';
+// Claude API 키 — 설정에서 입력하거나 여기 직접 입력
+let CLAUDE_KEY = localStorage.getItem('claude_api_key')||'';
 const SRC = 'http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getWordSearch';
 const DTL = 'http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getPatentUtilityInfo';
 const PROXIES = [
@@ -651,9 +660,51 @@ function calcDates(rd){
 }
 function normName(s){return(s||'').replace(/[\(\)（）\s]/g,'').replace(/주식회사|㈜/g,'').toLowerCase();}
 
+// 로컬 서버 주소
+const LOCAL = 'http://localhost:5050';
+let useLocal = false;
+
+async function checkLocal(){
+  try{
+    const r=await fetch(`${LOCAL}/search?word=test&status=R&rows=1`,{signal:AbortSignal.timeout(2000)});
+    if(r.ok){useLocal=true;updateStatus(true);}
+  }catch(e){useLocal=false;updateStatus(false);}
+}
+
+function updateStatus(ok){
+  const el=document.getElementById('server-status');
+  if(!el)return;
+  if(ok){
+    el.innerHTML='<span style="color:#2f9e44;font-weight:600">● 로컬 서버 연결됨 — 안정적 조회 가능</span>';
+    el.style.background='#ebfbee';el.style.borderColor='#8ce99a';
+  }else{
+    el.innerHTML='<span style="color:#e67700;font-weight:600">● 로컬 서버 없음</span> <span style="color:#495057">— CORS 프록시 사용 중 (불안정할 수 있음)</span>';
+    el.style.background='#fff9db';el.style.borderColor='#ffd43b';
+  }
+}
+
 async function fx(url){
+  const u=new URL(url);
+  const word=u.searchParams.get('word')||'';
+  const status=u.searchParams.get('registerStatus')||'R';
+  const appNo=u.searchParams.get('applicationNumber')||'';
+  const isDetail=url.includes('getPatentUtilityInfo');
+
+  // 1차: 로컬 서버 (py kipris_server.py 실행 중이면)
+  if(useLocal){
+    try{
+      const lurl=isDetail
+        ?`${LOCAL}/detail?appNo=${encodeURIComponent(appNo)}`
+        :`${LOCAL}/search?word=${encodeURIComponent(word)}&status=${encodeURIComponent(status)}&rows=30`;
+      const r=await fetch(lurl,{signal:AbortSignal.timeout(15000)});
+      if(r.ok){const t=await r.text();if(t.includes('resultCode'))return t;}
+    }catch(e){useLocal=false;updateStatus(false);}
+  }
+
+  // 2차: CORS 프록시
   for(const mk of PROXIES){
-    try{const r=await fetch(mk(url),{signal:AbortSignal.timeout(12000)});
+    try{
+      const r=await fetch(mk(url),{signal:AbortSignal.timeout(12000)});
       if(!r.ok)continue;
       const t=await r.text();
       if(t.includes('<response>')||t.includes('resultCode'))return t;
@@ -661,6 +712,8 @@ async function fx(url){
   }
   return 'ERR';
 }
+
+checkLocal();
 
 function parseAll(xml,alias){
   if(!xml||xml.startsWith('ERR'))return{list:[]};
