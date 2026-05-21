@@ -7,135 +7,136 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;
-  --border:#2a2f45;--border2:#363c58;
-  --text:#e2e8f0;--text2:#94a3b8;--text3:#475569;
-  --blue:#3b82f6;--blue-bg:rgba(59,130,246,.12);--blue-bd:rgba(59,130,246,.3);
-  --green:#10b981;--green-bg:rgba(16,185,129,.12);--green-bd:rgba(16,185,129,.3);
-  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.12);--amber-bd:rgba(245,158,11,.3);
-  --red:#ef4444;--red-bg:rgba(239,68,68,.12);--red-bd:rgba(239,68,68,.3);
+  --bg:#f8f9fa;--surface:#ffffff;--surface2:#f1f3f5;
+  --border:#dee2e6;--border2:#ced4da;
+  --text:#212529;--text2:#495057;--text3:#adb5bd;
+  --blue:#1971c2;--blue-bg:#e7f5ff;--blue-bd:#74c0fc;
+  --green:#2f9e44;--green-bg:#ebfbee;--green-bd:#8ce99a;
+  --amber:#e67700;--amber-bg:#fff9db;--amber-bd:#ffd43b;
+  --red:#c92a2a;--red-bg:#fff5f5;--red-bd:#ffa8a8;
   --font:'Noto Sans KR',system-ui,sans-serif;
   --mono:'JetBrains Mono','Fira Code',monospace;
-  --r:10px;--rs:6px;
+  --r:8px;--rs:6px;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;min-height:100vh}
 
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
-.logo{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#06b6d4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.htitle{font-size:15px;font-weight:700}
-.hsub{font-size:11px;color:var(--text2);margin-top:1px}
-.hright{margin-left:auto;font-size:11px;color:var(--text3)}
+.header{background:#1971c2;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.htitle{font-size:15px;font-weight:700;color:#fff}
+.hsub{font-size:11px;color:rgba(255,255,255,.75);margin-top:1px}
+.hright{margin-left:auto;font-size:11px;color:rgba(255,255,255,.6)}
 
-.search-section{padding:28px 24px 0}
-.stitle{font-size:20px;font-weight:700;margin-bottom:5px}
-.sdesc{font-size:12px;color:var(--text2);margin-bottom:18px;line-height:1.6}
+.search-section{background:#fff;border-bottom:1px solid var(--border);padding:24px}
+.stitle{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+.sdesc{font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6}
 .sbox{display:flex;gap:8px;margin-bottom:10px}
-.sbox input{flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);padding:11px 16px;font-size:15px;font-family:var(--font);outline:none;transition:border .2s}
+.sbox input{flex:1;background:#fff;border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);padding:11px 16px;font-size:15px;font-family:var(--font);outline:none;transition:border .2s}
 .sbox input:focus{border-color:var(--blue)}
 .sbox input::placeholder{color:var(--text3)}
-.btn-search{background:var(--blue);border:none;border-radius:var(--r);color:#fff;padding:11px 22px;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.btn-search{background:#1971c2;border:none;border-radius:var(--r);color:#fff;padding:11px 22px;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;white-space:nowrap;transition:opacity .15s}
 .btn-search:hover{opacity:.88}
-.btn-search:disabled{opacity:.4;cursor:not-allowed}
+.btn-search:disabled{opacity:.5;cursor:not-allowed}
 .qtags{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.qtag{background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:4px 11px;font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s}
-.qtag:hover{border-color:var(--blue);color:var(--blue)}
+.qtag{background:#f1f3f5;border:1px solid var(--border);border-radius:99px;padding:4px 11px;font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s}
+.qtag:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
 
-.result-section{padding:20px 24px}
+.result-section{padding:20px 24px;max-width:1000px}
 
-.badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
+.badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700}
 .b-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
 .b-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd)}
 .b-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd)}
-.b-gray{background:rgba(148,163,184,.1);color:var(--text2);border:1px solid var(--border)}
+.b-gray{background:#f1f3f5;color:var(--text3);border:1px solid var(--border)}
 .b-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
 
 .summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
-.scard{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center}
-.scard-n{font-size:22px;font-weight:700;font-family:var(--mono)}
+.scard{background:#fff;border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.scard-n{font-size:24px;font-weight:700;font-family:var(--mono)}
 .scard-l{font-size:10px;color:var(--text2);margin-top:3px}
-.n-g{color:var(--green)}.n-b{color:var(--blue)}.n-a{color:var(--amber)}.n-gray{color:var(--text2)}
+.ng{color:var(--green)}.nb{color:var(--blue)}.na{color:var(--amber)}.ngray{color:var(--text3)}
 
-.patent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:12px}
-.patent-card.card-usable{border-color:var(--green-bd);background:rgba(16,185,129,.04)}
-.patent-card.card-app{border-color:var(--amber-bd)}
-.patent-card.card-exp{opacity:.6}
+.patent-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.patent-card.card-usable{border-color:var(--green-bd);border-left:4px solid var(--green)}
+.patent-card.card-app{border-color:var(--amber-bd);border-left:4px solid var(--amber)}
+.patent-card.card-exp{border-color:var(--border);opacity:.7}
 
-.ptitle{font-size:15px;font-weight:700;line-height:1.4;margin:8px 0 12px}
+.ptitle{font-size:15px;font-weight:700;line-height:1.4;color:var(--text);margin:8px 0 12px}
 
 .pmeta{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
-.mitem{background:var(--surface2);border-radius:var(--rs);padding:8px 10px}
-.mlabel{font-size:10px;color:var(--text3);margin-bottom:2px}
+.mitem{background:#f8f9fa;border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px}
+.mlabel{font-size:10px;color:var(--text3);margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .mval{font-size:12px;font-weight:600;font-family:var(--mono);color:var(--text)}
 .mval.vg{color:var(--green)}.mval.va{color:var(--amber)}
 
-.slabel{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:7px;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.slabel{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:7px;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
 
-/* 초록 */
-.abstract-box{background:var(--surface2);border-radius:var(--rs);padding:12px;font-size:12px;line-height:1.75;color:var(--text2);margin-bottom:14px;white-space:pre-wrap;word-break:break-all}
+.abstract-box{background:#f8f9fa;border:1px solid var(--border);border-radius:var(--rs);padding:12px;font-size:12px;line-height:1.75;color:var(--text2);margin-bottom:14px;white-space:pre-wrap;word-break:break-all}
 
-/* 청구항 — 전체 표시, 절대 자르지 않음 */
+/* 청구항 박스 — 흰 바탕, 파란 테두리, 전체 표시 */
 .claim-wrap{margin-bottom:14px}
 .claim-box{
-  background:rgba(59,130,246,.06);
-  border:1px solid var(--blue-bd);
+  background:#fff;
+  border:1.5px solid var(--blue-bd);
   border-radius:var(--rs);
-  padding:14px 16px;
-  font-size:12px;
-  line-height:1.9;
+  padding:16px;
+  font-size:13px;
+  line-height:2;
   color:var(--text);
-  white-space:pre-wrap;      /* 줄바꿈 유지 */
-  word-break:break-all;      /* 긴 단어 줄바꿈 */
+  white-space:pre-wrap;
+  word-break:break-all;
   word-wrap:break-word;
   overflow-wrap:break-word;
-  /* 절대로 자르지 않음 — max-height/overflow 없음 */
+  /* 절대 자르지 않음 */
 }
-.claim-loading{color:var(--text2);font-style:italic;padding:12px;text-align:center;font-size:12px}
-.claim-empty{color:var(--text3);font-size:11px;padding:8px;font-style:italic}
+.claim-loading{color:var(--text3);font-style:italic;padding:12px;text-align:center;font-size:12px}
+.claim-empty{color:var(--text3);font-size:12px;padding:8px;font-style:italic}
 
-/* 구성요소 */
 .comp-wrap{margin-bottom:14px}
 .comp-list{display:flex;flex-direction:column;gap:5px}
 .comp-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--rs);font-size:12px;line-height:1.5}
 .comp-item.hi{background:var(--blue-bg);border:1px solid var(--blue-bd)}
-.comp-item.mi{background:var(--surface2)}
+.comp-item.mi{background:#f8f9fa;border:1px solid var(--border)}
 .comp-text{flex:1;color:var(--text)}
-.comp-badge{font-size:10px;padding:1px 6px;border-radius:99px;flex-shrink:0;white-space:nowrap}
+.comp-badge{font-size:10px;padding:1px 6px;border-radius:99px;flex-shrink:0;white-space:nowrap;font-weight:600}
 .cbh{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd)}
-.cbm{background:var(--surface2);color:var(--text3)}
+.cbm{background:#f1f3f5;color:var(--text3)}
 
-/* 시험 */
 .test-wrap{margin-bottom:14px}
 .test-tags{display:flex;gap:5px;flex-wrap:wrap}
-.test-tag{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:99px;padding:4px 10px;font-size:11px;color:var(--green)}
+.test-tag{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:99px;padding:4px 10px;font-size:11px;color:var(--green);font-weight:600}
 
-/* 효과 */
 .effect-wrap{margin-bottom:14px}
-.effect-box{background:var(--surface2);border-radius:var(--rs);padding:12px;font-size:12px;line-height:1.75;color:var(--text2);white-space:pre-wrap;word-break:break-all}
+.effect-box{background:#f8f9fa;border:1px solid var(--border);border-radius:var(--rs);padding:12px;font-size:12px;line-height:1.75;color:var(--text2);white-space:pre-wrap;word-break:break-all}
 
-/* 복사 버튼 */
-.copy-row{display:flex;gap:6px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--border)}
-.bcopy{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text2);padding:7px 13px;font-size:12px;font-family:var(--font);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px}
-.bcopy:hover{border-color:var(--blue);color:var(--blue)}
-.bcopy.copied{border-color:var(--green);color:var(--green)}
-.bclaim{background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:var(--rs);color:var(--blue);padding:7px 14px;font-size:12px;font-family:var(--font);cursor:pointer;transition:opacity .15s;font-weight:600;display:flex;align-items:center;gap:4px}
-.bclaim:hover{opacity:.8}
-.bcomp{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:var(--rs);color:var(--green);padding:7px 13px;font-size:12px;font-family:var(--font);cursor:pointer;transition:opacity .15s;display:flex;align-items:center;gap:4px}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+.copy-row{display:flex;gap:6px;flex-wrap:wrap}
+.bcopy{background:#f8f9fa;border:1px solid var(--border2);border-radius:var(--rs);color:var(--text2);padding:7px 13px;font-size:12px;font-family:var(--font);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px}
+.bcopy:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.bcopy.copied{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.bclaim{background:#1971c2;border:none;border-radius:var(--rs);color:#fff;padding:7px 14px;font-size:12px;font-family:var(--font);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:4px;transition:opacity .15s}
+.bclaim:hover{opacity:.88}
+.bclaim.copied{background:var(--green)}
+.bcomp{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:var(--rs);color:var(--green);padding:7px 13px;font-size:12px;font-family:var(--font);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:4px;transition:opacity .15s}
 .bcomp:hover{opacity:.8}
 
-.loading{text-align:center;padding:3rem;color:var(--text2)}
+.loading{text-align:center;padding:3rem;color:var(--text2);background:#fff;border-radius:var(--r);border:1px solid var(--border)}
 .spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.pstep{font-size:12px;color:var(--text3);margin-top:4px}
-.pstep.active{color:var(--blue)}
+.pstep{font-size:12px;color:var(--text3);margin-top:6px}
 
-.empty{text-align:center;padding:4rem 2rem;color:var(--text3)}
+.empty{text-align:center;padding:4rem 2rem;color:var(--text3);background:#fff;border-radius:var(--r);border:1px solid var(--border)}
 .empty-icon{font-size:44px;opacity:.3;margin-bottom:10px}
-.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+.status-bar{font-size:11px;color:var(--text3);background:#f8f9fa;border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
 @media(max-width:600px){
   .pmeta{grid-template-columns:repeat(2,1fr)}
   .summary-row{grid-template-columns:repeat(2,1fr)}
   .sbox{flex-direction:column}
+  .result-section{padding:14px}
 }
 </style>
 </head>
@@ -153,8 +154,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 <div class="search-section">
   <div class="stitle">기업 특허 조회</div>
   <div class="sdesc">
-    기업명을 입력하면 KIPRIS에서 전체 특허를 조회합니다.<br>
-    <strong style="color:var(--blue)">청구항 1항 전문</strong>을 그대로 복사해서 제안서에 바로 붙여넣을 수 있습니다.
+    기업명을 입력하면 KIPRIS에서 전체 특허를 실시간으로 조회합니다.<br>
+    <strong style="color:#1971c2">청구항 1항 전문</strong>을 그대로 복사해서 제안서에 바로 붙여넣을 수 있습니다.
   </div>
   <div class="sbox">
     <input type="text" id="inp" placeholder="기업명 입력 (예: 파이터코리아, 오에스엘이엔지, 유원티이씨...)" autocomplete="off">
@@ -174,18 +175,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 </div>
 
 <div class="result-section" id="area">
-  <div class="empty">
+  <div class="empty" style="margin-top:16px">
     <div class="empty-icon">📋</div>
-    <div style="font-size:14px;margin-bottom:4px">기업명을 입력하고 조회하세요</div>
-    <div style="font-size:12px;color:var(--text3)">특허명 · 등록번호 · 등록일 · 만료일 · 청구항 1항 전문이 표시됩니다</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:var(--text)">기업명을 입력하고 조회하세요</div>
+    <div style="font-size:12px">특허명 · 등록번호 · 등록일 · 만료일 · 청구항 1항 전문이 표시됩니다</div>
   </div>
 </div>
 
 <script>
-const KEY  = 'Mk1YvlvbqQGzVQDXukYLom7nD5U3wVkD15K5nUxCwI0=';
-const SRC  = 'http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getWordSearch';
-const DTL  = 'http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getPatentUtilityInfo';
-const PX   = 'https://corsproxy.io/?';
+const KEY = 'Mk1YvlvbqQGzVQDXukYLom7nD5U3wVkD15K5nUxCwI0=';
+const SRC = 'http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getWordSearch';
+const DTL = 'http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getPatentUtilityInfo';
+
+// CORS 프록시 — 실패 시 다음으로 자동 전환
+const PROXIES = [
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://proxy.cors.sh/${url}`,
+];
 
 const HKW = ['자동소화','소화','화재감지','연기감지','가스감지','불꽃감지','스프링클러',
   'AI','인공지능','딥러닝','영상분석','디지털트윈','IoT','스마트제어',
@@ -209,13 +216,13 @@ const TMAP=[
   [['전기차','배터리','리튬'],'전기차 화재 안전성 시험'],
 ];
 
-const claimStore={};
+const claimStore = {};
 
 function fd(s){return s&&s.length===8?`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}`:s||''}
 
-function calcDates(regDt){
-  if(!regDt||regDt.length!==8) return {exp:'-',yrs:null,new7:false,dl:'-'};
-  const d=new Date(+regDt.slice(0,4),+regDt.slice(4,6)-1,+regDt.slice(6));
+function calcDates(rd){
+  if(!rd||rd.length!==8) return {exp:'-',yrs:null,new7:false,dl:'-'};
+  const d=new Date(+rd.slice(0,4),+rd.slice(4,6)-1,+rd.slice(6));
   const exp=new Date(d); exp.setFullYear(exp.getFullYear()+20);
   const cut=new Date(d); cut.setFullYear(cut.getFullYear()+7);
   const now=new Date();
@@ -227,20 +234,25 @@ function calcDates(regDt){
 }
 
 async function fx(url){
-  try{
-    const r=await fetch(PX+encodeURIComponent(url),{signal:AbortSignal.timeout(15000)});
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return await r.text();
-  }catch(e){return 'ERR:'+e.message}
+  // 여러 프록시 순서대로 시도
+  for(const mkProxy of PROXIES){
+    try{
+      const r=await fetch(mkProxy(url),{signal:AbortSignal.timeout(12000)});
+      if(!r.ok) continue;
+      const text=await r.text();
+      if(text.includes('<response>') || text.includes('resultCode')) return text;
+    }catch(e){continue;}
+  }
+  return 'ERR:모든 프록시 실패';
 }
 
-function px(xml,alias){
-  if(xml.startsWith('ERR')) return {list:[],err:xml};
+function parsePatents(xml, alias){
+  if(!xml||xml.startsWith('ERR')) return {list:[],err:xml};
   try{
     const doc=new DOMParser().parseFromString(xml,'text/xml');
     const code=doc.querySelector('resultCode')?.textContent||'';
     if(code==='22') return {list:[],limit:true};
-    if(!['00','N0001',''].includes(code)) return {list:[],err:`[${code}]`};
+    if(!['00','N0001',''].includes(code)) return {list:[],err:`코드:${code}`};
     const list=[];
     doc.querySelectorAll('item').forEach(it=>{
       const g=t=>it.querySelector(t)?.textContent?.trim()||'';
@@ -261,7 +273,7 @@ function px(xml,alias){
         abs:g('astrtCont'),appl,inv:g('inventorName'),ipc:g('ipcNumber')});
     });
     return {list};
-  }catch(e){return {list:[],err:'파싱:'+e.message}}
+  }catch(e){return {list:[],err:'파싱오류'};}
 }
 
 async function searchAll(alias){
@@ -269,10 +281,10 @@ async function searchAll(alias){
   for(const st of ['R','A','C','F','G']){
     const url=`${SRC}?${new URLSearchParams({ServiceKey:KEY,word:alias,year:'0',numOfRows:'30',pageNo:'1',registerStatus:st})}`;
     const xml=await fx(url);
-    const {list,limit}=px(xml,alias);
+    const {list,limit}=parsePatents(xml,alias);
     if(limit) break;
     if(list) all.push(...list);
-    await new Promise(r=>setTimeout(r,200));
+    await new Promise(r=>setTimeout(r,300));
   }
   const seen=new Set(),u=[];
   all.forEach(p=>{const k=p.rn_raw||p.an; if(k&&!seen.has(k)){seen.add(k);u.push(p);}});
@@ -289,7 +301,7 @@ async function fetchClaim(an){
   if(!an) return {c1:'',eff:''};
   const url=`${DTL}?${new URLSearchParams({ServiceKey:KEY,applicationNumber:an})}`;
   const xml=await fx(url);
-  if(xml.startsWith('ERR')) return {c1:'',eff:''};
+  if(!xml||xml.startsWith('ERR')) return {c1:'',eff:''};
   try{
     const doc=new DOMParser().parseFromString(xml,'text/xml');
     let raw='';
@@ -302,7 +314,7 @@ async function fetchClaim(an){
       const v=doc.querySelector(t)?.textContent?.trim()||'';
       if(v){eff=v;break;}
     }
-    // 청구항 1항 추출 — 전체, 자르지 않음
+    // 청구항 1항 전체 — 길이 제한 없음
     let c1='';
     if(raw){
       const pats=[
@@ -312,9 +324,9 @@ async function fetchClaim(an){
       ];
       for(const pat of pats){
         const m=raw.match(pat);
-        if(m&&m[1].trim()){c1=m[1].trim();break;}  // 길이 제한 없음!
+        if(m&&m[1].trim()){c1=m[1].trim();break;}
       }
-      if(!c1) c1=raw; // 패턴 못찾으면 전체 반환
+      if(!c1) c1=raw; // 패턴 없으면 전체
     }
     return {c1,eff};
   }catch(e){return {c1:'',eff:''};}
@@ -333,12 +345,20 @@ function analyzeComp(c1){
   });
   const tests=TMAP.filter(([kws])=>kws.some(k=>c1.includes(k))).map(([,t])=>t);
   const hc=comps.filter(c=>c.hi).length;
-  const str=hc>=3?'🔥 강함 — 핵심기술 키워드 다수':hc>=1?'✅ 보통 — 조달 관련 키워드 포함':'⚠ 약함 — 스토리 보완 필요';
+  const str=hc>=3?'🔥 강함':hc>=1?'✅ 보통':'⚠ 약함';
   return {comps,tests,str};
 }
 
 function copyText(text,el){
   navigator.clipboard.writeText(text).then(()=>{
+    const o=el.innerHTML; el.innerHTML='✓ 복사됨!'; el.classList.add('copied');
+    setTimeout(()=>{el.innerHTML=o;el.classList.remove('copied');},2000);
+  }).catch(()=>{
+    // fallback
+    const ta=document.createElement('textarea');
+    ta.value=text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
     const o=el.innerHTML; el.innerHTML='✓ 복사됨!'; el.classList.add('copied');
     setTimeout(()=>{el.innerHTML=o;el.classList.remove('copied');},2000);
   });
@@ -352,6 +372,7 @@ function makeCard(p,idx){
   const sb=usable?'<span class="badge b-green">✓ 7년미만 조달유력</span>':
     isApp?'<span class="badge b-amber">출원중</span>':
     isExp?`<span class="badge b-red">${p.st}</span>`:'<span class="badge b-gray">7년 초과</span>';
+  const t=JSON.stringify;
   return `<div class="patent-card ${cc}" id="pc${idx}">
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">${sb}</div>
     <div class="ptitle">${p.title}</div>
@@ -363,16 +384,16 @@ function makeCard(p,idx){
       <div class="mitem"><div class="mlabel">경과년수</div><div class="mval">${p.yrs!=null?p.yrs+'년 경과':'-'}</div></div>
       <div class="mitem"><div class="mlabel">조달 활용기한</div><div class="mval ${usable?'vg':'va'}">${p.dl||'-'}</div></div>
       ${p.inv?`<div class="mitem"><div class="mlabel">발명자</div><div class="mval">${p.inv}</div></div>`:''}
-      ${p.ipc?`<div class="mitem"><div class="mlabel">IPC 분류</div><div class="mval" style="font-size:11px">${p.ipc.slice(0,40)}</div></div>`:''}
+      ${p.ipc?`<div class="mitem"><div class="mlabel">IPC 분류</div><div class="mval" style="font-size:11px">${p.ipc.slice(0,50)}</div></div>`:''}
     </div>
     ${p.abs?`<div class="slabel">📄 기술 요약 (초록)</div><div class="abstract-box">${p.abs}</div>`:''}
     <div class="claim-wrap">
-      <div class="slabel">📋 청구항 1항 <span style="color:var(--text3);font-weight:400;font-size:10px;text-transform:none">— 전문 (잘리지 않음)</span></div>
+      <div class="slabel">📋 청구항 1항 <span style="color:var(--text3);font-weight:400;font-size:10px;text-transform:none;letter-spacing:0">— 전문, 잘리지 않음</span></div>
       <div class="claim-box" id="cl${idx}"><div class="claim-loading">⏳ 청구항 불러오는 중...</div></div>
     </div>
     <div class="comp-wrap" id="cw${idx}" style="display:none">
       <div class="slabel">🔵 핵심 구성요소 (세미콜론 분석)</div>
-      <div class="comp-list" id="cl_comp${idx}"></div>
+      <div class="comp-list" id="cc${idx}"></div>
     </div>
     <div class="test-wrap" id="tw${idx}" style="display:none">
       <div class="slabel">🧪 시험 연결 제안</div>
@@ -384,12 +405,12 @@ function makeCard(p,idx){
     </div>
     <div class="divider"></div>
     <div class="copy-row">
-      <button class="bcopy" onclick="copyText(${JSON.stringify(p.title)},this)">📋 특허명</button>
-      <button class="bcopy" onclick="copyText(${JSON.stringify(p.reg_no||p.an||'')},this)">📋 등록번호</button>
-      <button class="bcopy" onclick="copyText(${JSON.stringify(p.rd||p.ad||'')},this)">📋 등록일</button>
-      <button class="bcopy" onclick="copyText(${JSON.stringify(p.exp||'')},this)">📋 만료일</button>
-      <button class="bclaim" id="ccl${idx}" style="display:none" onclick="copyStore(${idx})">⭐ 청구항1 전체 복사</button>
-      <button class="bcomp" id="cco${idx}" style="display:none" onclick="copyComp(${idx})">📌 핵심구성 복사</button>
+      <button class="bcopy" onclick="copyText(${t(p.title)},this)">📋 특허명</button>
+      <button class="bcopy" onclick="copyText(${t(p.reg_no||p.an||'')},this)">📋 등록번호</button>
+      <button class="bcopy" onclick="copyText(${t(p.rd||p.ad||'')},this)">📋 등록일</button>
+      <button class="bcopy" onclick="copyText(${t(p.exp||'')},this)">📋 만료일</button>
+      <button class="bclaim" id="cb${idx}" style="display:none" onclick="copyStore(${idx})">⭐ 청구항1 전체 복사</button>
+      <button class="bcomp" id="co${idx}" style="display:none" onclick="copyComp(${idx})">📌 핵심구성 복사</button>
     </div>
   </div>`;
 }
@@ -399,30 +420,29 @@ async function loadClaim(p,idx){
   const cwEl=document.getElementById(`cw${idx}`);
   const twEl=document.getElementById(`tw${idx}`);
   const ewEl=document.getElementById(`ew${idx}`);
-  const cclBtn=document.getElementById(`ccl${idx}`);
-  const ccoBtn=document.getElementById(`cco${idx}`);
+  const cbBtn=document.getElementById(`cb${idx}`);
+  const coBtn=document.getElementById(`co${idx}`);
   if(!clEl) return;
 
   const {c1,eff}=await fetchClaim(p.an);
   claimStore[idx]={c1,comps:[]};
 
   if(c1){
-    // 청구항 1항 전체 표시 — 절대 자르지 않음
-    clEl.textContent=c1;
-    cclBtn.style.display='flex';
+    clEl.textContent=c1; // textContent로 그대로 표시
+    cbBtn.style.display='flex';
 
     const {comps,tests,str}=analyzeComp(c1);
     claimStore[idx].comps=comps;
 
     if(comps.length>0){
       cwEl.style.display='block';
-      document.getElementById(`cl_comp${idx}`).innerHTML=comps.map(c=>`
+      document.getElementById(`cc${idx}`).innerHTML=comps.map(c=>`
         <div class="comp-item ${c.hi?'hi':'mi'}">
           <span>${c.hi?'🔵':'⚪'}</span>
           <span class="comp-text">${c.text}</span>
           <span class="comp-badge ${c.hi?'cbh':'cbm'}">${c.hi?'핵심':'일반'}</span>
         </div>`).join('');
-      ccoBtn.style.display='flex';
+      coBtn.style.display='flex';
     }
     if(tests.length>0){
       twEl.style.display='block';
@@ -433,20 +453,18 @@ async function loadClaim(p,idx){
       document.getElementById(`ef${idx}`).textContent=eff;
     }
   } else {
-    clEl.innerHTML=`<div class="claim-empty">이 특허의 청구항 정보가 아직 등록되지 않았습니다.<br>출원 초기 단계이거나 비공개 상태일 수 있습니다.</div>`;
+    clEl.innerHTML=`<div class="claim-empty">이 특허의 청구항 정보를 불러오지 못했습니다.<br>출원 초기 단계이거나 KIPRIS 상세 정보가 아직 없을 수 있습니다.</div>`;
   }
 }
 
 function copyStore(idx){
   const t=claimStore[idx]?.c1||'';
-  const btn=document.getElementById(`ccl${idx}`);
-  copyText(t,btn);
+  copyText(t,document.getElementById(`cb${idx}`));
 }
 function copyComp(idx){
   const comps=claimStore[idx]?.comps||[];
   const text=comps.map(c=>(c.hi?'[핵심] ':'')+c.text).join('\n');
-  const btn=document.getElementById(`cco${idx}`);
-  copyText(text,btn);
+  copyText(text,document.getElementById(`co${idx}`));
 }
 
 async function doSearch(){
@@ -456,21 +474,22 @@ async function doSearch(){
   btn.disabled=true; btn.textContent='조회 중...';
   Object.keys(claimStore).forEach(k=>delete claimStore[k]);
 
-  document.getElementById('area').innerHTML=`<div class="loading">
+  document.getElementById('area').innerHTML=`<div class="loading" style="margin-top:16px">
     <div class="spinner"></div>
-    <div style="font-size:13px;margin-bottom:8px">"${alias}" 특허 조회 중...</div>
-    <div class="pstep active">KIPRIS 특허 데이터베이스 검색 중...</div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)">"${alias}" 특허 조회 중...</div>
+    <div class="pstep">KIPRIS 특허 데이터베이스 검색 중 (등록·출원·소멸 전체)</div>
   </div>`;
 
   try{
     const patents=await searchAll(alias);
     if(!patents.length){
-      document.getElementById('area').innerHTML=`<div class="empty">
+      document.getElementById('area').innerHTML=`<div class="empty" style="margin-top:16px">
         <div class="empty-icon">🔍</div>
-        <div style="font-size:14px;margin-bottom:6px">"${alias}" — 특허 없음</div>
-        <div style="font-size:12px;line-height:1.8;color:var(--text3)">
-          KIPRIS에 등록된 출원인명과 일치하지 않을 수 있습니다.<br>
-          법인명 앞뒤 '주식회사', '(주)' 등을 빼고 핵심 상호만 입력해 보세요.
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px;color:var(--text)">"${alias}" — 특허 없음</div>
+        <div style="font-size:12px;line-height:1.8">
+          KIPRIS 출원인명과 정확히 일치해야 합니다.<br>
+          법인명 앞뒤 '주식회사', '(주)', '㈜' 등을 제외한 핵심 상호만 입력해 보세요.<br>
+          예) "주식회사 파이터코리아" → <strong>파이터코리아</strong>
         </div>
       </div>`;
       return;
@@ -482,30 +501,34 @@ async function doSearch(){
     const exp=patents.filter(p=>['소멸/만료','포기','거절'].includes(p.st));
 
     document.getElementById('area').innerHTML=`
-      <div style="margin-bottom:14px">
-        <div style="font-size:16px;font-weight:700;margin-bottom:3px">"${alias}" 특허 현황</div>
-        <div style="font-size:11px;color:var(--text3)">KIPRIS 조회 · ${new Date().toLocaleDateString('ko-KR')} 기준 · 총 ${patents.length}건</div>
+      <div style="margin:16px 0 14px">
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px">"${alias}" 특허 현황</div>
+        <div style="font-size:11px;color:var(--text3)">KIPRIS 실시간 조회 · ${new Date().toLocaleDateString('ko-KR')} 기준 · 총 ${patents.length}건</div>
       </div>
       <div class="summary-row">
-        <div class="scard"><div class="scard-n n-g">${yr7.length}</div><div class="scard-l">7년미만 조달유력</div></div>
-        <div class="scard"><div class="scard-n n-b">${reg.length}</div><div class="scard-l">등록 특허</div></div>
-        <div class="scard"><div class="scard-n n-a">${app.length}</div><div class="scard-l">출원중</div></div>
-        <div class="scard"><div class="scard-n n-gray">${exp.length}</div><div class="scard-l">소멸/만료</div></div>
+        <div class="scard"><div class="scard-n ng">${yr7.length}</div><div class="scard-l">7년미만 조달유력</div></div>
+        <div class="scard"><div class="scard-n nb">${reg.length}</div><div class="scard-l">등록 특허</div></div>
+        <div class="scard"><div class="scard-n na">${app.length}</div><div class="scard-l">출원중</div></div>
+        <div class="scard"><div class="scard-n ngray">${exp.length}</div><div class="scard-l">소멸/만료</div></div>
       </div>
+      <div class="status-bar" id="sbar"><span class="status-dot"></span> 청구항 1항 불러오는 중... (0/${patents.filter(p=>p.st==='등록'||p.st==='출원').length}건)</div>
       <div id="pcont">${patents.map((p,i)=>makeCard(p,i)).join('')}</div>`;
 
-    // 청구항 순차 로드 — 전체 특허 대상 (등록+출원)
+    // 청구항 순차 로드
     const targets=patents.filter(p=>p.st==='등록'||p.st==='출원');
-    for(const p of targets){
+    for(let i=0;i<targets.length;i++){
+      const p=targets[i];
       const idx=patents.indexOf(p);
-      document.querySelector(`#cl${idx} .claim-loading`) &&
-        (document.getElementById(`cl${idx}`).innerHTML=`<div class="claim-loading">⏳ 청구항 불러오는 중... (${idx+1}/${targets.length})</div>`);
+      const sbar=document.getElementById('sbar');
+      if(sbar) sbar.innerHTML=`<span class="status-dot"></span> 청구항 1항 불러오는 중... (${i+1}/${targets.length}건) — ${p.title.slice(0,30)}...`;
       await loadClaim(p,idx);
       await new Promise(r=>setTimeout(r,400));
     }
+    const sbar=document.getElementById('sbar');
+    if(sbar){sbar.innerHTML='✅ 청구항 1항 로드 완료';sbar.style.color='var(--green)';sbar.querySelector('.status-dot')?.remove();}
 
   }catch(e){
-    document.getElementById('area').innerHTML=`<div style="background:var(--red-bg);border:1px solid var(--red-bd);border-radius:var(--r);padding:16px;color:var(--red);font-size:13px">오류: ${e.message}</div>`;
+    document.getElementById('area').innerHTML=`<div style="background:var(--red-bg);border:1px solid var(--red-bd);border-radius:var(--r);padding:16px;color:var(--red);font-size:13px;margin-top:16px">오류: ${e.message}</div>`;
   }finally{
     btn.disabled=false; btn.textContent='특허 조회';
   }
