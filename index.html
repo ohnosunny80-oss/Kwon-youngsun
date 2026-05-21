@@ -98,7 +98,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#1a
 .ctype{font-size:10px;padding:1px 6px;border-radius:99px;background:#ffebee;color:#b71c1c;font-weight:700;display:inline-block}
 .cprod{font-size:12px;font-weight:700;color:#111;margin:4px 0 2px;line-height:1.4}
 .cdet{font-size:10px;color:#aaa;line-height:1.7;font-family:monospace}
-.note-ta{width:100%;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;padding:10px 12px;resize:vertical;min-height:120px;line-height:1.8;font-family:inherit;outline:none;color:#111}
+.note-ta{width:100%;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;padding:10px 12px;resize:vertical;min-height:120px;max-height:600px;overflow-y:auto;line-height:1.8;font-family:inherit;outline:none;color:#111;transition:height 0.2s}
 .note-ta:focus{border-color:#b71c1c}
 .onote{margin-top:6px;padding:8px 10px;border-radius:7px;font-size:11px}
 .nodata{font-size:11px;color:#ccc;font-style:italic;padding:4px 0}
@@ -615,56 +615,86 @@ function startWhisper(b){
   var btn=document.getElementById('whisper-btn-'+b);
   if(isRecording){
     /* 녹음 중지 */
-    if(mediaRec) mediaRec.stop();
+    isRecording=false;
+    if(mediaRec&&mediaRec.state!=='inactive') mediaRec.stop();
+    btn.textContent='🎙 녹음 시작 → AI 자동 변환';
+    btn.style.background='#4caf50';
+    btn.style.color='#fff';
+    btn.style.border='none';
     return;
   }
-  /* 녹음 시작 */
+
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
     audioChunks=[];
-    mediaRec=new MediaRecorder(stream);
-    mediaRec.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
-    mediaRec.onstart=function(){
-      isRecording=true;
-      btn.textContent='⏹ 중지 (탭하면 변환)';
-      btn.style.background='#ffebee';
-      btn.style.color='#b71c1c';
-      btn.style.border='1.5px solid #ef9a9a';
-    };
-    mediaRec.onstop=function(){
-      isRecording=false;
-      btn.textContent='⏳ 변환 중...';
-      btn.style.background='#fff9c4';
-      btn.style.color='#e65100';
-      stream.getTracks().forEach(function(t){t.stop();});
-      /* Whisper API로 전송 */
-      var blob=new Blob(audioChunks,{type:'audio/webm'});
-      fetch('https://white-morning-52ad.yourstoryup.workers.dev/',{
-        method:'POST',
-        headers:{'Content-Type':'audio/webm'},
-        body:blob
-      }).then(function(r){return r.json();}).then(function(d){
-        console.log('Whisper 응답:', JSON.stringify(d));
-        var text=d.text||(d.error&&d.error.message?'오류: '+d.error.message:('응답: '+JSON.stringify(d)));
-        var ta=document.querySelector('.note-ta[data-b="'+b+'"]');
-        if(ta){
-          ta.value=(ta.value?ta.value+'\n':'')+text;
-          saveNote(b,ta.value);
+    var fullText='';
+    var chunkNum=0;
+
+    /* 30초마다 자동 저장하는 타이머 */
+    var chunkTimer=null;
+
+    function startChunk(){
+      audioChunks=[];
+      mediaRec=new MediaRecorder(stream, {mimeType:'audio/webm'});
+      mediaRec.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
+
+      mediaRec.onstop=function(){
+        if(audioChunks.length===0) return;
+        var blob=new Blob(audioChunks,{type:'audio/webm'});
+        chunkNum++;
+        btn.textContent='⏳ 변환 중... ('+chunkNum+'번째)';
+
+        fetch('https://white-morning-52ad.yourstoryup.workers.dev/',{
+          method:'POST',
+          headers:{'Content-Type':'audio/webm'},
+          body:blob
+        }).then(function(r){return r.json();}).then(function(d){
+          var text=d.text||(d.error&&d.error.message?d.error.message:'');
+          if(text){
+            fullText+=(fullText?'\n':'')+text;
+            var ta=document.querySelector('.note-ta[data-b="'+b+'"]');
+            if(ta){
+              ta.value=fullText;
+              /* 텍스트 길이에 맞게 높이 자동 조절 */
+              ta.style.height='auto';
+              ta.style.height=Math.min(ta.scrollHeight, 600)+'px';
+              saveNote(b,fullText);
+              /* 스크롤을 맨 아래로 */
+              ta.scrollTop=ta.scrollHeight;
+            }
+          }
+          if(isRecording){
+            btn.textContent='⏹ 녹음 중... (탭하면 종료)';
+            btn.style.background='#f44336';
+            startChunk();
+          } else {
+            btn.textContent='🎙 녹음 시작 → AI 자동 변환';
+            btn.style.background='#4caf50';
+            btn.style.color='#fff';
+          }
+        }).catch(function(){
+          if(isRecording) startChunk();
+        });
+      };
+
+      mediaRec.start();
+      /* 30초 후 자동으로 이 조각 저장하고 다음 시작 */
+      chunkTimer=setTimeout(function(){
+        if(isRecording&&mediaRec&&mediaRec.state==='recording'){
+          mediaRec.stop();
         }
-        btn.textContent='🎙 녹음 시작';
-        btn.style.background='#e8f5e9';
-        btn.style.color='#2e7d32';
-        btn.style.border='1.5px solid #a5d6a7';
-      }).catch(function(e){
-        btn.textContent='🎙 녹음 시작';
-        btn.style.background='#e8f5e9';
-        btn.style.color='#2e7d32';
-        btn.style.border='1.5px solid #a5d6a7';
-        alert('변환 실패: '+e.message);
-      });
-    };
-    mediaRec.start();
+      }, 30000);
+    }
+
+    isRecording=true;
+    btn.textContent='⏹ 녹음 중... (탭하면 종료)';
+    btn.style.background='#f44336';
+    btn.style.color='#fff';
+    btn.style.border='none';
+
+    startChunk();
+
   }).catch(function(e){
-    alert('마이크 권한을 허용해주세요.\n브라우저 설정에서 마이크를 허용하세요.');
+    alert('마이크 권한을 허용해주세요.');
   });
 }
 
