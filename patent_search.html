@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
 <title>특허 검색 — 한국조달컨설팅</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#f8f9fa !important;}
+html,body{background:#f8f9fa !important}
 :root{
   --bg:#f8f9fa;--surface:#ffffff;--surface2:#f1f3f5;
   --border:#dee2e6;--border2:#ced4da;
@@ -21,15 +20,72 @@ html,body{background:#f8f9fa !important;}
   --mono:'JetBrains Mono','Fira Code',monospace;
   --r:8px;--rs:6px;
 }
-body{background:#f8f9fa !important;color:var(--text);font-family:var(--font);font-size:13px;min-height:100vh}
+body{background:#f8f9fa;color:var(--text);font-family:var(--font);font-size:13px;min-height:100vh}
 
+/* 헤더 */
 .header{background:#1971c2;padding:14px 24px;display:flex;align-items:center;gap:12px}
 .logo{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .htitle{font-size:15px;font-weight:700;color:#fff}
 .hsub{font-size:11px;color:rgba(255,255,255,.75);margin-top:1px}
 .hright{margin-left:auto;font-size:11px;color:rgba(255,255,255,.6)}
 
-.search-section{background:#fff;border-bottom:1px solid var(--border);padding:24px}
+/* 탭 */
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--border);padding:0 24px}
+.tab{padding:12px 20px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text3);transition:all .15s}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab:hover:not(.active){color:var(--text2)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* 프로세스 가이드 */
+.process-section{padding:24px;max-width:900px}
+.process-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.process-desc{font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+
+.steps{display:flex;flex-direction:column;gap:0}
+.step-item{display:flex;gap:16px;position:relative}
+.step-item:not(:last-child)::before{content:'';position:absolute;left:19px;top:44px;bottom:-1px;width:2px;background:var(--border);z-index:0}
+.step-num{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;z-index:1;margin-top:4px}
+.s1 .step-num{background:#e7f5ff;color:#1971c2;border:2px solid #74c0fc}
+.s2 .step-num{background:#ebfbee;color:#2f9e44;border:2px solid #8ce99a}
+.s3 .step-num{background:#fff9db;color:#e67700;border:2px solid #ffd43b}
+.s4 .step-num{background:#f3f0ff;color:#7048e8;border:2px solid #b197fc}
+.step-body{flex:1;padding:4px 0 24px}
+.step-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.s1 .step-label{color:#1971c2}
+.s2 .step-label{color:#2f9e44}
+.s3 .step-label{color:#e67700}
+.s4 .step-label{color:#7048e8}
+.step-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.step-detail{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px}
+.step-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;font-size:12px}
+.step-box.code{background:#1e2a3a;color:#a8dadc;font-family:var(--mono);font-size:12px;line-height:1.7}
+.step-box.code .c-gray{color:#6b7280}
+.step-box.code .c-green{color:#6ee7b7}
+.step-box.code .c-blue{color:#93c5fd}
+.step-box.code .c-yellow{color:#fcd34d}
+
+.info-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px}
+.info-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.info-text{font-size:12px;color:var(--text2);line-height:1.6}
+
+.rights-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.rights-table th{background:#f1f3f5;padding:7px 10px;text-align:left;font-weight:600;border:1px solid var(--border);color:var(--text2)}
+.rights-table td{padding:7px 10px;border:1px solid var(--border);line-height:1.5}
+.rights-table tr:hover td{background:#f8f9fa}
+.tag-aaa{display:inline-block;background:#e7f5ff;color:#1971c2;border:1px solid #74c0fc;border-radius:99px;padding:1px 7px;font-size:10px;font-weight:700}
+.tag-aa{display:inline-block;background:#ebfbee;color:#2f9e44;border:1px solid #8ce99a;border-radius:99px;padding:1px 7px;font-size:10px;font-weight:700}
+.tag-a{display:inline-block;background:#fff9db;color:#e67700;border:1px solid #ffd43b;border-radius:99px;padding:1px 7px;font-size:10px;font-weight:700}
+.tag-c{display:inline-block;background:#f1f3f5;color:#868e96;border:1px solid var(--border);border-radius:99px;padding:1px 7px;font-size:10px;font-weight:700}
+
+.dl-btn{display:inline-flex;align-items:center;gap:6px;background:#1971c2;color:#fff;border:none;border-radius:var(--rs);padding:9px 16px;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;margin-top:10px;transition:opacity .15s}
+.dl-btn:hover{opacity:.88}
+.dl-btn.green{background:#2f9e44}
+
+.notice-box{background:#fff9db;border:1px solid #ffd43b;border-radius:var(--rs);padding:12px 14px;font-size:12px;color:#854d0e;line-height:1.7;margin-top:10px}
+
+/* 검색 탭 */
+.search-section{padding:24px;background:#fff;border-bottom:1px solid var(--border)}
 .stitle{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
 .sdesc{font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6}
 .sbox{display:flex;gap:8px;margin-bottom:10px}
@@ -39,61 +95,50 @@ body{background:#f8f9fa !important;color:var(--text);font-family:var(--font);fon
 .btn-search{background:#1971c2;border:none;border-radius:var(--r);color:#fff;padding:11px 22px;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;white-space:nowrap;transition:opacity .15s}
 .btn-search:hover{opacity:.88}
 .btn-search:disabled{opacity:.5;cursor:not-allowed}
-.qtags{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.qtag{background:#f1f3f5;border:1px solid var(--border);border-radius:99px;padding:4px 11px;font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s}
-.qtag:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.mode-toggle{display:flex;gap:6px;margin-bottom:12px;align-items:center}
+.mode-btn{padding:6px 14px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border2);background:#fff;color:var(--text2);transition:all .15s;font-family:var(--font)}
+.mode-btn.active{background:#1971c2;border-color:#1971c2;color:#fff}
+.mode-desc{font-size:11px;color:var(--text3);margin-left:4px}
 
-.result-section{padding:20px 24px;max-width:1000px}
+.json-upload-area{border:2px dashed var(--border2);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;transition:all .15s;background:#fff}
+.json-upload-area:hover{border-color:var(--blue);background:var(--blue-bg)}
+.json-upload-area.dragover{border-color:var(--green);background:var(--green-bg)}
+.upload-icon{font-size:32px;margin-bottom:8px;opacity:.5}
+.upload-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.upload-sub{font-size:12px;color:var(--text2)}
+#file-input{display:none}
 
+.result-section{padding:20px 24px}
 .badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700}
 .b-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
 .b-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd)}
 .b-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd)}
 .b-gray{background:#f1f3f5;color:var(--text3);border:1px solid var(--border)}
 .b-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
+.b-purple{background:#f3f0ff;color:#7048e8;border:1px solid #b197fc}
 
 .summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
 .scard{background:#fff;border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.scard-n{font-size:24px;font-weight:700;font-family:var(--mono)}
+.scard-n{font-size:22px;font-weight:700;font-family:var(--mono)}
 .scard-l{font-size:10px;color:var(--text2);margin-top:3px}
 .ng{color:var(--green)}.nb{color:var(--blue)}.na{color:var(--amber)}.ngray{color:var(--text3)}
 
 .patent-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .patent-card.card-usable{border-color:var(--green-bd);border-left:4px solid var(--green)}
 .patent-card.card-app{border-color:var(--amber-bd);border-left:4px solid var(--amber)}
-.patent-card.card-exp{border-color:var(--border);opacity:.7}
-
+.patent-card.card-exp{border-color:var(--border);opacity:.65}
 .ptitle{font-size:15px;font-weight:700;line-height:1.4;color:var(--text);margin:8px 0 12px}
-
 .pmeta{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
 .mitem{background:#f8f9fa;border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px}
 .mlabel{font-size:10px;color:var(--text3);margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .mval{font-size:12px;font-weight:600;font-family:var(--mono);color:var(--text)}
-.mval.vg{color:var(--green)}.mval.va{color:var(--amber)}
-
+.mval.vg{color:var(--green)}.mval.va{color:var(--amber)}.mval.vp{color:#7048e8}
 .slabel{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:7px;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
-
 .abstract-box{background:#f8f9fa;border:1px solid var(--border);border-radius:var(--rs);padding:12px;font-size:12px;line-height:1.75;color:var(--text2);margin-bottom:14px;white-space:pre-wrap;word-break:break-all}
-
-/* 청구항 박스 — 흰 바탕, 파란 테두리, 전체 표시 */
 .claim-wrap{margin-bottom:14px}
-.claim-box{
-  background:#fff;
-  border:1.5px solid var(--blue-bd);
-  border-radius:var(--rs);
-  padding:16px;
-  font-size:13px;
-  line-height:2;
-  color:var(--text);
-  white-space:pre-wrap;
-  word-break:break-all;
-  word-wrap:break-word;
-  overflow-wrap:break-word;
-  /* 절대 자르지 않음 */
-}
+.claim-box{background:#fff;border:1.5px solid var(--blue-bd);border-radius:var(--rs);padding:16px;font-size:13px;line-height:2;color:var(--text);white-space:pre-wrap;word-break:break-all;word-wrap:break-word;overflow-wrap:break-word}
 .claim-loading{color:var(--text3);font-style:italic;padding:12px;text-align:center;font-size:12px}
 .claim-empty{color:var(--text3);font-size:12px;padding:8px;font-style:italic}
-
 .comp-wrap{margin-bottom:14px}
 .comp-list{display:flex;flex-direction:column;gap:5px}
 .comp-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--rs);font-size:12px;line-height:1.5}
@@ -103,449 +148,777 @@ body{background:#f8f9fa !important;color:var(--text);font-family:var(--font);fon
 .comp-badge{font-size:10px;padding:1px 6px;border-radius:99px;flex-shrink:0;white-space:nowrap;font-weight:600}
 .cbh{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd)}
 .cbm{background:#f1f3f5;color:var(--text3)}
-
 .test-wrap{margin-bottom:14px}
 .test-tags{display:flex;gap:5px;flex-wrap:wrap}
 .test-tag{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:99px;padding:4px 10px;font-size:11px;color:var(--green);font-weight:600}
-
 .effect-wrap{margin-bottom:14px}
 .effect-box{background:#f8f9fa;border:1px solid var(--border);border-radius:var(--rs);padding:12px;font-size:12px;line-height:1.75;color:var(--text2);white-space:pre-wrap;word-break:break-all}
-
 .divider{border:none;border-top:1px solid var(--border);margin:14px 0}
-
 .copy-row{display:flex;gap:6px;flex-wrap:wrap}
-.bcopy{background:#f8f9fa;border:1px solid var(--border2);border-radius:var(--rs);color:var(--text2);padding:7px 13px;font-size:12px;font-family:var(--font);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px}
+.bcopy{background:#f8f9fa;border:1px solid var(--border2);border-radius:var(--rs);color:var(--text2);padding:7px 13px;font-size:12px;font-family:var(--font);cursor:pointer;transition:all .15s}
 .bcopy:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
 .bcopy.copied{border-color:var(--green);color:var(--green);background:var(--green-bg)}
-.bclaim{background:#1971c2;border:none;border-radius:var(--rs);color:#fff;padding:7px 14px;font-size:12px;font-family:var(--font);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:4px;transition:opacity .15s}
+.bclaim{background:#1971c2;border:none;border-radius:var(--rs);color:#fff;padding:7px 14px;font-size:12px;font-family:var(--font);cursor:pointer;font-weight:600;transition:opacity .15s}
 .bclaim:hover{opacity:.88}
 .bclaim.copied{background:var(--green)}
-.bcomp{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:var(--rs);color:var(--green);padding:7px 13px;font-size:12px;font-family:var(--font);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:4px;transition:opacity .15s}
+.bcomp{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:var(--rs);color:var(--green);padding:7px 13px;font-size:12px;font-family:var(--font);cursor:pointer;font-weight:600;transition:opacity .15s}
 .bcomp:hover{opacity:.8}
 
-.loading{text-align:center;padding:3rem;color:var(--text2);background:#fff;border-radius:var(--r);border:1px solid var(--border)}
+.loading{text-align:center;padding:3rem;color:var(--text2);background:#fff;border-radius:var(--r);border:1px solid var(--border);margin-top:16px}
 .spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.pstep{font-size:12px;color:var(--text3);margin-top:6px}
-
-.empty{text-align:center;padding:4rem 2rem;color:var(--text3);background:#fff;border-radius:var(--r);border:1px solid var(--border)}
-.empty-icon{font-size:44px;opacity:.3;margin-bottom:10px}
-
+.empty{text-align:center;padding:4rem 2rem;color:var(--text3);background:#fff;border-radius:var(--r);border:1px solid var(--border);margin-top:16px}
 .status-bar{font-size:11px;color:var(--text3);background:#f8f9fa;border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:blink 1s infinite}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:blink 1s infinite;flex-shrink:0}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* 회사 선택 */
+.co-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:16px}
+.co-btn{background:#fff;border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;cursor:pointer;transition:all .15s;text-align:left}
+.co-btn:hover{border-color:var(--blue);background:var(--blue-bg)}
+.co-btn.active{border-color:var(--blue);background:var(--blue-bg);border-width:2px}
+.co-btn-name{font-size:13px;font-weight:600;color:var(--text)}
+.co-btn-sub{font-size:11px;color:var(--text2);margin-top:2px}
 
 @media(max-width:600px){
   .pmeta{grid-template-columns:repeat(2,1fr)}
   .summary-row{grid-template-columns:repeat(2,1fr)}
   .sbox{flex-direction:column}
   .result-section{padding:14px}
+  .steps{gap:0}
 }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="logo">🔍</div>
+  <div class="logo">📋</div>
   <div>
     <div class="htitle">특허 검색 & 청구항 분석</div>
-    <div class="hsub">기업명 입력 → KIPRIS 실시간 조회 → 청구항 1항 전체 추출 → 제안서 복사</div>
+    <div class="hsub">한국조달컨설팅(주) — KIPRIS 특허 조회 & 제안서 자동화 플랫폼</div>
   </div>
-  <div class="hright">한국조달컨설팅(주)</div>
+  <div class="hright">권영선 대표</div>
 </div>
 
+<!-- 탭 -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('guide')">📖 사용 가이드</div>
+  <div class="tab" onclick="switchTab('search')">🔍 실시간 검색</div>
+  <div class="tab" onclick="switchTab('upload')">📂 JSON 업로드 (정밀)</div>
+</div>
+
+<!-- TAB 1: 사용 가이드 -->
+<div id="tab-guide" class="tab-panel active">
+<div class="process-section">
+  <div class="process-title">특허 조회 & 제안서 작성 프로세스</div>
+  <div class="process-desc">두 가지 방법으로 사용할 수 있어요. 정확도가 중요하면 Python 방식을 추천합니다.</div>
+
+  <!-- 방법 비교 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+    <div style="background:#fff;border:2px solid var(--blue-bd);border-radius:var(--r);padding:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">⚡ 방법 A — 실시간 검색</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7">
+        기업명 입력 → 바로 검색<br>
+        <span style="color:var(--green)">✓</span> 빠름, 간편<br>
+        <span style="color:var(--amber)">△</span> 출원인 기준 (RG/TRH/EL 구분 불가)<br>
+        <span style="color:var(--amber)">△</span> 청구항 로드 느릴 수 있음
+      </div>
+    </div>
+    <div style="background:#fff;border:2px solid var(--green-bd);border-radius:var(--r);padding:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">🎯 방법 B — Python + JSON (추천)</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7">
+        PC에서 스크립트 실행 → JSON 업로드<br>
+        <span style="color:var(--green)">✓</span> RG/TRH/EL 권리 종류 정확 구분<br>
+        <span style="color:var(--green)">✓</span> 등록/출원/소멸/포기 전부<br>
+        <span style="color:var(--green)">✓</span> 청구항1 + 시험연결 자동 분석
+      </div>
+    </div>
+  </div>
+
+  <!-- 방법 B 상세 단계 -->
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px;color:var(--text)">🎯 방법 B 상세 가이드 (Python → JSON → 앱)</div>
+
+  <div class="steps">
+
+    <!-- STEP 1 -->
+    <div class="step-item s1">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-label">STEP 1 — 준비</div>
+        <div class="step-title">Python 스크립트 다운로드</div>
+        <div class="step-detail">
+          아래 버튼으로 스크립트를 다운로드하고 작업 폴더에 저장하세요.<br>
+          <strong>C:\Users\Julia\Desktop\제안서앱 만들기\</strong> 폴더에 넣으면 됩니다.
+        </div>
+        <button class="dl-btn" onclick="downloadScript()">⬇ kipris_final_v10.py 다운로드</button>
+        <div class="notice-box" style="margin-top:10px">
+          💡 Python이 설치되어 있어야 합니다. 없으면 <strong>python.org</strong>에서 설치하세요.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-item s2">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-label">STEP 2 — 실행</div>
+        <div class="step-title">CMD에서 스크립트 실행</div>
+        <div class="step-detail">
+          CMD(명령 프롬프트)를 열고 아래 명령어를 순서대로 입력하세요.
+        </div>
+        <div class="step-box code">
+          <span class="c-gray"># 1. 작업 폴더로 이동</span><br>
+          cd Desktop\<span class="c-yellow">"제안서앱 만들기"</span><br><br>
+          <span class="c-gray"># 2. 스크립트 실행 (약 5~10분 소요)</span><br>
+          py <span class="c-green">kipris_final_v10.py</span><br><br>
+          <span class="c-gray"># 3. 완료 메시지 확인</span><br>
+          <span class="c-green">✅ patent_results.json 저장 완료!</span>
+        </div>
+        <div style="margin-top:10px;background:#fff;border:1px solid var(--border);border-radius:var(--rs);padding:12px;font-size:12px">
+          <div style="font-weight:700;margin-bottom:8px">수집되는 정보:</div>
+          <table class="rights-table">
+            <tr><th>권리 종류</th><th>의미</th><th>조달 활용</th></tr>
+            <tr><td><span class="tag-aaa">RG</span> 등록권자</td><td>현재 특허 소유자</td><td>✅ 기술소명자료 단독 사용</td></tr>
+            <tr><td><span class="tag-aa">TRH</span> 최종권리자</td><td>양도·이전 반영 실질 소유자</td><td>✅ 기술소명자료 사용 가능</td></tr>
+            <tr><td><span class="tag-a">EL</span> 전용실시권</td><td>독점 사용권자</td><td>✅ 기술소명자료 사용 가능</td></tr>
+            <tr><td><span class="tag-c">AP</span> 출원인</td><td>출원 단계</td><td>⚠ 등록 후 활용 가능</td></tr>
+          </table>
+          <div style="margin-top:8px;color:var(--text2)">+ 등록일 · 출원일 · 만료일 · 경과년수 · 조달활용기한 · IPC분류 · 발명자 · 초록 · 청구항1</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-item s3">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-label">STEP 3 — 업로드</div>
+        <div class="step-title">JSON 파일을 이 앱에 업로드</div>
+        <div class="step-detail">
+          실행 완료 후 같은 폴더에 생성된 <strong>patent_results.json</strong> 파일을<br>
+          상단 <strong>"JSON 업로드"</strong> 탭에서 업로드하세요.
+        </div>
+        <div class="step-box" style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:24px">📁</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:3px">patent_results.json</div>
+            <div style="font-size:11px;color:var(--text2)">C:\Users\Julia\Desktop\제안서앱 만들기\ 폴더에 저장됨</div>
+          </div>
+          <button class="dl-btn green" style="margin-top:0;margin-left:auto" onclick="switchTab('upload')">JSON 업로드 탭으로 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-item s4">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-label">STEP 4 — 활용</div>
+        <div class="step-title">청구항 복사 → 제안서 작성</div>
+        <div class="step-detail">업로드 완료 후 각 특허별로 아래 정보를 바로 복사할 수 있습니다.</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+          <div class="step-box">
+            <div style="font-weight:700;margin-bottom:6px;font-size:12px">📋 복사 가능 항목</div>
+            <div class="info-row"><span class="info-icon">✓</span><span class="info-text">특허명</span></div>
+            <div class="info-row"><span class="info-icon">✓</span><span class="info-text">등록번호</span></div>
+            <div class="info-row"><span class="info-icon">✓</span><span class="info-text">등록일 / 출원일 / 만료일</span></div>
+            <div class="info-row"><span class="info-icon">✓</span><span class="info-text">⭐ 청구항 1항 전문</span></div>
+            <div class="info-row"><span class="info-icon">✓</span><span class="info-text">📌 핵심 구성요소 (세미콜론 분석)</span></div>
+          </div>
+          <div class="step-box">
+            <div style="font-weight:700;margin-bottom:6px;font-size:12px">🧪 자동 분석</div>
+            <div class="info-row"><span class="info-icon">🔵</span><span class="info-text">핵심 기술 키워드 하이라이트</span></div>
+            <div class="info-row"><span class="info-icon">🧪</span><span class="info-text">시험 연결 항목 자동 제안</span></div>
+            <div class="info-row"><span class="info-icon">💡</span><span class="info-text">발명의 효과 추출</span></div>
+            <div class="info-row"><span class="info-icon">📊</span><span class="info-text">7년미만 조달유력 자동 판별</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /steps -->
+</div>
+</div>
+
+<!-- TAB 2: 실시간 검색 -->
+<div id="tab-search" class="tab-panel">
 <div class="search-section">
-  <div class="stitle">기업 특허 조회</div>
+  <div class="stitle">실시간 특허 검색</div>
   <div class="sdesc">
-    기업명을 입력하면 KIPRIS에서 전체 특허를 실시간으로 조회합니다.<br>
-    <strong style="color:#1971c2">청구항 1항 전문</strong>을 그대로 복사해서 제안서에 바로 붙여넣을 수 있습니다.
+    기업명을 입력하면 KIPRIS에서 실시간으로 조회합니다. (출원인 기준)<br>
+    <span style="color:var(--amber)">⚠ RG/TRH/EL 권리 구분이 필요하면 Python 스크립트를 사용하세요.</span>
   </div>
   <div class="sbox">
-    <input type="text" id="inp" placeholder="기업명 입력 (예: 파이터코리아, 오에스엘이엔지, 유원티이씨...)" autocomplete="off">
+    <input type="text" id="inp" placeholder="기업명 입력 (예: 파이터코리아, 이유씨엔씨, 유원티이씨...)" autocomplete="off">
     <button class="btn-search" id="btn" onclick="doSearch()">특허 조회</button>
   </div>
-  <div class="qtags">
-    <span style="font-size:11px;color:var(--text3)">빠른 검색:</span>
-    <span class="qtag" onclick="quick('파이터코리아')">파이터코리아</span>
-    <span class="qtag" onclick="quick('오에스엘이엔지')">오에스엘이엔지</span>
-    <span class="qtag" onclick="quick('에이앤지테크')">에이앤지테크</span>
-    <span class="qtag" onclick="quick('유원티이씨')">유원티이씨</span>
-    <span class="qtag" onclick="quick('써보레')">써보레</span>
-    <span class="qtag" onclick="quick('싸이버메딕')">싸이버메딕</span>
-    <span class="qtag" onclick="quick('엔에프방재')">엔에프방재</span>
-    <span class="qtag" onclick="quick('한컴라이프케어')">한컴라이프케어</span>
-  </div>
 </div>
-
 <div class="result-section" id="area">
-  <div class="empty" style="margin-top:16px">
-    <div class="empty-icon">📋</div>
+  <div class="empty">
+    <div style="font-size:36px;opacity:.3;margin-bottom:10px">🔍</div>
     <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:var(--text)">기업명을 입력하고 조회하세요</div>
     <div style="font-size:12px">특허명 · 등록번호 · 등록일 · 만료일 · 청구항 1항 전문이 표시됩니다</div>
   </div>
 </div>
+</div>
+
+<!-- TAB 3: JSON 업로드 -->
+<div id="tab-upload" class="tab-panel">
+<div class="search-section">
+  <div class="stitle">JSON 파일 업로드 (정밀 분석)</div>
+  <div class="sdesc">
+    Python 스크립트로 생성한 <strong>patent_results.json</strong>을 업로드하면<br>
+    RG/TRH/EL 권리 종류 구분 + 청구항 분석이 포함된 정밀 결과를 확인할 수 있습니다.
+  </div>
+  <div class="json-upload-area" id="drop-zone" onclick="document.getElementById('file-input').click()"
+    ondragover="event.preventDefault();this.classList.add('dragover')"
+    ondragleave="this.classList.remove('dragover')"
+    ondrop="handleDrop(event)">
+    <div class="upload-icon">📂</div>
+    <div class="upload-text">patent_results.json 파일을 여기에 드래그하거나 클릭하세요</div>
+    <div class="upload-sub">Python 스크립트 실행 후 생성된 파일을 업로드하세요</div>
+    <input type="file" id="file-input" accept=".json" onchange="loadJson(this.files[0])">
+  </div>
+  <!-- 업체 선택 -->
+  <div id="co-picker-wrap" style="display:none;margin-top:16px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">업체 선택 (특허 있는 업체만 표시)</div>
+    <div class="co-picker" id="co-picker"></div>
+  </div>
+</div>
+<div class="result-section" id="json-area">
+  <div class="empty">
+    <div style="font-size:36px;opacity:.3;margin-bottom:10px">📂</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:var(--text)">JSON 파일을 업로드하세요</div>
+    <div style="font-size:12px">사용 가이드 탭에서 Python 스크립트 실행 방법을 확인하세요</div>
+  </div>
+</div>
+</div>
 
 <script>
+// ── 탭 전환 ─────────────────────────────────────
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const ids=['guide','search','upload'];
+    t.classList.toggle('active',ids[i]===id);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+// ── Python 스크립트 다운로드 ──────────────────────
+function downloadScript(){
+  const script = `#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+KIPRIS 특허 조회 최종판 v10
+RG(등록권자) / TRH(최종권리자) / EL(전용실시권) / AP(출원인) 전부 수집
+실행: py kipris_final_v10.py
+결과: patent_results.json
+"""
+import urllib.request, urllib.parse, xml.etree.ElementTree as ET
+import json, time, re
+from datetime import datetime
+
+KIPRIS_KEY  = "Mk1YvlvbqQGzVQDXukYLom7nD5U3wVkD15K5nUxCwI0="
+BASE_SEARCH = "http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getWordSearch"
+BASE_DETAIL = "http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getPatentUtilityInfo"
+
+ALL_STATUS = [("R","등록"),("A","출원"),("C","소멸/만료"),("F","포기"),("G","거절")]
+
+# 조사할 업체 목록 — 필요에 따라 추가/수정하세요
+COMPANIES = [
+    {"name":"(주)빅트론",           "alias":"빅트론",        "pri":"★★★","cert":["혁신제품","우수제품"],      "memo":"융복합 화재감지기"},
+    {"name":"(주)파이터코리아",      "alias":"파이터코리아",  "pri":"★★★","cert":["혁신제품","우수제품"],     "memo":"기존고객"},
+    {"name":"(주)써보레",            "alias":"써보레",        "pri":"★★★","cert":["우수제품"],                "memo":"호흡 보호구"},
+    {"name":"(주)오에스엘이엔지",    "alias":"오에스엘이엔지","pri":"★★★","cert":["우수제품","NEP"],          "memo":"유도등·화재감지"},
+    {"name":"㈜에이앤지테크",        "alias":"에이앤지테크",  "pri":"★★★","cert":["우수제품재신청"],          "memo":"소방 장비"},
+    {"name":"루씨엠(주)",            "alias":"루씨엠",        "pri":"★★★","cert":["MAS"],                    "memo":"응급구조"},
+    {"name":"주식회사 한컴라이프케어","alias":"한컴라이프케어","pri":"★★","cert":["조달컨설팅"],             "memo":"방독면"},
+    {"name":"주식회사 엔에프방재",   "alias":"엔에프방재",    "pri":"★★", "cert":["조달컨설팅"],             "memo":"전기차 화재"},
+    {"name":"주식회사 케이디펜스",   "alias":"케이디펜스",    "pri":"★★", "cert":["우수제품"],               "memo":"공기호흡기"},
+    {"name":"싸이버메딕",            "alias":"싸이버메딕",    "pri":"★★", "cert":["조달컨설팅"],             "memo":"재활"},
+    {"name":"주식회사 유원티이씨",   "alias":"유원티이씨",    "pri":"★★", "cert":["우수제품연장"],           "memo":"소화 덮개"},
+    {"name":"(주)테이슨",            "alias":"테이슨",        "pri":"★★", "cert":["GS인증","우수제품"],       "memo":"관제 시스템"},
+    {"name":"㈜위니텍",              "alias":"위니텍",        "pri":"★★", "cert":["조달컨설팅"],             "memo":"구급차량"},
+    # 여기에 업체 추가:
+    # {"name":"회사명", "alias":"검색키워드", "pri":"★★★", "cert":["인증종류"], "memo":"메모"},
+]
+
+def api_get(url):
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent":"Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            return r.read().decode("utf-8")
+    except Exception as e:
+        return f"ERROR:{e}"
+
+def fmt_date(s):
+    return f"{s[:4]}-{s[4:6]}-{s[6:]}" if s and len(s)==8 else (s or "")
+
+def calc_dates(reg_dt):
+    try:
+        d = datetime.strptime(reg_dt, "%Y%m%d")
+        exp = d.replace(year=d.year+20)
+        cut = d.replace(year=d.year+7)
+        now = datetime.now()
+        cutoff = datetime(now.year-7, 1, 1)
+        yrs = (now-d).days//365
+        left7 = (cut-now).days//365
+        new7 = d >= cutoff
+        dl = f"{cut.strftime('%Y-%m-%d')} ({left7}년 남음)" if new7 and left7>0 else ("곧 만료" if new7 else "7년 초과")
+        return exp.strftime("%Y-%m-%d"), yrs, new7, dl
+    except:
+        return "-", None, False, "-"
+
+def get_claim1(app_no):
+    if not app_no: return "", ""
+    params = urllib.parse.urlencode({"ServiceKey":KIPRIS_KEY,"applicationNumber":app_no})
+    xml = api_get(BASE_DETAIL + "?" + params)
+    if xml.startswith("ERROR"): return "", ""
+    try:
+        root = ET.fromstring(xml)
+        claim_raw = next((root.findtext(f".//{t}","") for t in
+            ["claimText","claim","clm","claimData","claims"] if root.findtext(f".//{t}","")), "")
+        effect = next((root.findtext(f".//{t}","") for t in
+            ["advantageousEffects","effect","effectsOfInvention"] if root.findtext(f".//{t}","")), "")
+        claim1 = ""
+        if claim_raw:
+            for pat in [
+                r'【청구항\\s*1】\\s*([\\s\\S]*?)(?=【청구항\\s*2】|$)',
+                r'청구항\\s*1[.：]\\s*([\\s\\S]*?)(?=\\n청구항\\s*2|$)',
+                r'^\\s*1[.):]\\s+([\\s\\S]*?)(?=\\n\\s*2[.):]\\s|$)',
+            ]:
+                m = re.search(pat, claim_raw, re.DOTALL|re.MULTILINE)
+                if m and m.group(1).strip():
+                    claim1 = m.group(1).strip(); break
+            if not claim1: claim1 = claim_raw
+        return claim1, effect[:600]
+    except: return "", ""
+
+def search_company(alias):
+    all_patents = []
+    for st_code, st_label in ALL_STATUS:
+        params = urllib.parse.urlencode({
+            "ServiceKey": KIPRIS_KEY, "word": alias,
+            "year": "0", "numOfRows": "30", "pageNo": "1", "registerStatus": st_code
+        })
+        xml = api_get(BASE_SEARCH + "?" + params)
+        if xml.startswith("ERROR"): continue
+        try:
+            root = ET.fromstring(xml)
+            code = root.findtext(".//resultCode","")
+            if code == "22": return all_patents, True
+            for item in root.findall(".//item"):
+                appl = item.findtext("applicantName","") or ""
+                if alias not in appl: continue
+                rn = item.findtext("registerNumber","") or ""
+                rd = item.findtext("registerDate","") or ""
+                an = item.findtext("applicationNumber","") or ""
+                ad = item.findtext("applicationDate","") or ""
+                rs = item.findtext("registerStatus","") or ""
+                if rn and rd: st = "등록"
+                elif any(k in rs for k in ["소멸","취하"]): st = "소멸/만료"
+                elif "포기" in rs: st = "포기"
+                elif "거절" in rs: st = "거절"
+                else: st = "출원"
+                exp, yrs, new7, dl = calc_dates(rd)
+                rn_fmt = rn
+                if len(rn)==13: rn_fmt = f"10-{rn[2:9]}-{rn[9:]}"
+                can_use = (st=="등록" and new7)
+                note = ("✅ 기술소명자료 활용 가능" if can_use else
+                        "⚠ 출원중" if st=="출원" else f"❌ {st}")
+                all_patents.append({
+                    "right_code":"RG","right_label":"등록권자(RG)",
+                    "patent_status":st,"reg_status_raw":rs,
+                    "can_use":can_use,"procurement_note":note,
+                    "title":item.findtext("inventionTitle","") or "",
+                    "reg_no":rn_fmt,"reg_no_raw":rn,"app_no":an,
+                    "reg_date":fmt_date(rd),"app_date":fmt_date(ad),
+                    "expire_date":exp,"years_passed":yrs,
+                    "procurement_deadline":dl,"is_new_7yr":new7,
+                    "abstract":(item.findtext("astrtCont","") or "")[:400],
+                    "applicant":appl,
+                    "inventor":item.findtext("inventorName","") or "",
+                    "ipc":item.findtext("ipcNumber","") or "",
+                    "claim1":"","effect":"",
+                })
+        except: pass
+        time.sleep(0.2)
+    seen, unique = set(), []
+    for p in all_patents:
+        k = p["reg_no_raw"] or p["app_no"]
+        if k and k not in seen: seen.add(k); unique.append(p)
+    unique.sort(key=lambda p:(
+        0 if p["can_use"] else 1,
+        {"등록":0,"출원":1,"소멸/만료":2,"포기":3,"거절":4}.get(p["patent_status"],9),
+        -(int((p["reg_date"] or p["app_date"] or "0").replace("-","")) or 0)
+    ))
+    return unique, False
+
+def main():
+    print("="*60)
+    print("KIPRIS 특허 조회 최종판 v10")
+    print("="*60)
+    results = []
+    api_limit = False
+    for i, co in enumerate(COMPANIES):
+        if api_limit:
+            print(f"[{i+1}/{len(COMPANIES)}] {co['name']} — API 한도 초과")
+            results.append({**co,"patents":[],"summary":{},"status":"SKIPPED"})
+            continue
+        print(f"\\n[{i+1}/{len(COMPANIES)}] {co['name']} ({co['alias']})", end=" ", flush=True)
+        patents, hit_limit = search_company(co["alias"])
+        if hit_limit:
+            print("⚠ API 한도 초과!")
+            api_limit = True
+            results.append({**co,"patents":[],"summary":{},"status":"API_LIMIT"})
+            continue
+        reg = [p for p in patents if p["patent_status"]=="등록"]
+        app = [p for p in patents if p["patent_status"]=="출원"]
+        new7 = [p for p in reg if p["is_new_7yr"]]
+        usable = [p for p in patents if p["can_use"]]
+        if patents:
+            print(f"✓ 전체:{len(patents)} | 등록:{len(reg)} | 출원:{len(app)} | 7년미만:{len(new7)}")
+            for p in usable[:3]:
+                print(f"  ★[{p['patent_status']}] {p['title'][:40]} | {p['reg_date']}")
+            # 청구항 조회
+            for p in usable[:3]:
+                if not p["app_no"]: continue
+                print(f"  📄 청구항: {p['title'][:35]}", end=" ", flush=True)
+                c1, eff = get_claim1(p["app_no"])
+                p["claim1"] = c1; p["effect"] = eff
+                print("✓" if c1 else "없음")
+                time.sleep(0.4)
+        else:
+            print("특허없음")
+        results.append({
+            "name":co["name"],"alias":co["alias"],"priority":co["pri"],
+            "cert":co["cert"],"memo":co["memo"],
+            "summary":{"전체":len(patents),"등록":len(reg),"출원중":len(app),
+                       "7년미만":len(new7),"조달활용":len(usable)},
+            "patents":patents,"status":"OK"
+        })
+        time.sleep(0.3)
+    with open("patent_results.json","w",encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+    print("\\n✅ patent_results.json 저장 완료!")
+    print("→ 앱의 'JSON 업로드' 탭에서 이 파일을 업로드하세요!")
+
+if __name__ == "__main__":
+    main()
+`;
+  const blob = new Blob([script], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'kipris_final_v10.py';
+  a.click();
+}
+
+// ── KIPRIS API (실시간 검색) ─────────────────────
 const KEY = 'Mk1YvlvbqQGzVQDXukYLom7nD5U3wVkD15K5nUxCwI0=';
 const SRC = 'http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getWordSearch';
 const DTL = 'http://plus.kipris.or.kr/kipo-api/kipi/patUtiModInfoSearchSevice/getPatentUtilityInfo';
-
-// CORS 프록시 — 실패 시 다음으로 자동 전환
 const PROXIES = [
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://proxy.cors.sh/${url}`,
+  u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u=>`https://proxy.cors.sh/${u}`,
 ];
-
-const HKW = ['자동소화','소화','화재감지','연기감지','가스감지','불꽃감지','스프링클러',
-  'AI','인공지능','딥러닝','영상분석','디지털트윈','IoT','스마트제어',
-  '미세먼지','공기정화','UV살균','살균','항균','에너지절감','고효율','LED',
-  '내진','방폭','방수','방진','내화','원격감시','자동제어','센서','측정',
-  '응급','구조','구급','심정지','심장충격','AED','재활','뇌신경','전기차','배터리'];
-
-const TMAP=[
-  [['소화','소화약제'],'소화 성능 시험 (KFI 기준)'],
-  [['화재감지','연기감지','불꽃감지'],'화재감지 응답시간 시험'],
-  [['가스감지','CO2'],'가스 농도 감지 정확도 시험'],
-  [['미세먼지','공기정화'],'공기청정 성능 시험 (PM2.5)'],
-  [['LED','조명'],'광도·광효율 시험 (KSC)'],
-  [['에너지절감','소비전력'],'에너지 효율 시험'],
-  [['방수','방진'],'방수·방진 시험 (IP등급)'],
-  [['내진','진동'],'내진·내충격 성능 시험'],
-  [['AI','인공지능','영상'],'AI 인식 정확도 시험'],
-  [['무선','통신','IoT'],'무선 통신 성능 시험'],
-  [['센서','측정'],'센서 정확도 시험'],
-  [['응급','구조','심정지','AED'],'응급구조 성능 시험'],
-  [['전기차','배터리','리튬'],'전기차 화재 안전성 시험'],
-];
-
-const claimStore = {};
+const HKW=['자동소화','소화','화재감지','연기감지','가스감지','불꽃감지','스프링클러',
+  'AI','인공지능','딥러닝','영상분석','IoT','스마트제어','미세먼지','공기정화',
+  '살균','항균','에너지절감','고효율','LED','내진','방폭','방수','방진','내화',
+  '원격감시','자동제어','센서','측정','응급','구조','구급','심정지','AED','재활','전기차','배터리'];
+const TMAP=[[['소화','소화약제'],'소화 성능 시험 (KFI)'],[['화재감지','연기감지'],'화재감지 응답시간 시험'],
+  [['가스감지'],'가스 농도 감지 시험'],[['미세먼지','공기정화'],'공기청정 성능 시험'],
+  [['LED','조명'],'광도·광효율 시험'],[['에너지절감'],'에너지 효율 시험'],
+  [['방수','방진'],'방수·방진 시험 (IP)'],[['내진'],'내진·내충격 시험'],
+  [['AI','인공지능'],'AI 인식 정확도 시험'],[['무선','IoT'],'무선 통신 성능 시험'],
+  [['센서','측정'],'센서 정확도 시험'],[['응급','심정지','AED'],'응급구조 성능 시험'],
+  [['전기차','배터리'],'전기차 화재 안전성 시험']];
+const claimStore={};
 
 function fd(s){return s&&s.length===8?`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}`:s||''}
-
 function calcDates(rd){
-  if(!rd||rd.length!==8) return {exp:'-',yrs:null,new7:false,dl:'-'};
+  if(!rd||rd.length!==8) return{exp:'-',yrs:null,new7:false,dl:'-'};
   const d=new Date(+rd.slice(0,4),+rd.slice(4,6)-1,+rd.slice(6));
-  const exp=new Date(d); exp.setFullYear(exp.getFullYear()+20);
-  const cut=new Date(d); cut.setFullYear(cut.getFullYear()+7);
+  const exp=new Date(d);exp.setFullYear(exp.getFullYear()+20);
+  const cut=new Date(d);cut.setFullYear(cut.getFullYear()+7);
   const now=new Date();
   const yrs=Math.floor((now-d)/(365.25*864e5));
   const new7=d>=new Date(now.getFullYear()-7,0,1);
   const left=Math.floor((cut-now)/(365.25*864e5));
   const dl=new7?(left>0?`${cut.toISOString().slice(0,10)} (${left}년 남음)`:'곧 만료'):'7년 초과';
-  return {exp:exp.toISOString().slice(0,10),yrs,new7,dl};
+  return{exp:exp.toISOString().slice(0,10),yrs,new7,dl};
 }
+function normName(s){return(s||'').replace(/[\(\)（）\s]/g,'').replace(/주식회사|㈜/g,'').toLowerCase();}
 
 async function fx(url){
-  // 여러 프록시 순서대로 시도
-  for(const mkProxy of PROXIES){
-    try{
-      const r=await fetch(mkProxy(url),{signal:AbortSignal.timeout(12000)});
-      if(!r.ok) continue;
-      const text=await r.text();
-      if(text.includes('<response>') || text.includes('resultCode')) return text;
+  for(const mk of PROXIES){
+    try{const r=await fetch(mk(url),{signal:AbortSignal.timeout(12000)});
+      if(!r.ok)continue;
+      const t=await r.text();
+      if(t.includes('<response>')||t.includes('resultCode'))return t;
     }catch(e){continue;}
   }
-  return 'ERR:모든 프록시 실패';
+  return 'ERR';
 }
 
-function parsePatents(xml, alias){
-  if(!xml||xml.startsWith('ERR')) return {list:[],err:xml};
+function parseAll(xml,alias){
+  if(!xml||xml.startsWith('ERR'))return{list:[]};
   try{
     const doc=new DOMParser().parseFromString(xml,'text/xml');
     const code=doc.querySelector('resultCode')?.textContent||'';
-    if(code==='22') return {list:[],limit:true};
-    if(!['00','N0001',''].includes(code)) return {list:[],err:`코드:${code}`};
+    if(code==='22')return{list:[],limit:true};
+    if(!['00','N0001',''].includes(code))return{list:[]};
     const list=[];
     doc.querySelectorAll('item').forEach(it=>{
       const g=t=>it.querySelector(t)?.textContent?.trim()||'';
       const appl=g('applicantName');
-      // 필터 없음 — 출원인 그룹핑은 searchAll에서 처리
-      const rn=g('registerNumber'), rd=g('registerDate');
-      const an=g('applicationNumber'), ad=g('applicationDate');
+      const rn=g('registerNumber'),rd=g('registerDate');
+      const an=g('applicationNumber'),ad=g('applicationDate');
       const rs=g('registerStatus');
       let st='출원';
-      if(rn&&rd) st='등록';
-      else if(['소멸','취하'].some(k=>rs.includes(k))) st='소멸/만료';
-      else if(rs.includes('포기')) st='포기';
-      else if(rs.includes('거절')) st='거절';
+      if(rn&&rd)st='등록';
+      else if(['소멸','취하'].some(k=>rs.includes(k)))st='소멸/만료';
+      else if(rs.includes('포기'))st='포기';
+      else if(rs.includes('거절'))st='거절';
       const dates=calcDates(rd);
-      let fno=rn; if(rn.length===13) fno=`10-${rn.slice(2,9)}-${rn.slice(9)}`;
+      let fno=rn;if(rn.length===13)fno=`10-${rn.slice(2,9)}-${rn.slice(9)}`;
       list.push({st,title:g('inventionTitle'),reg_no:fno,rn_raw:rn,an,
         rd:fd(rd),ad:fd(ad),exp:dates.exp,yrs:dates.yrs,new7:dates.new7,dl:dates.dl,
-        abs:g('astrtCont'),appl,inv:g('inventorName'),ipc:g('ipcNumber')});
+        abs:g('astrtCont'),appl,inv:g('inventorName'),ipc:g('ipcNumber'),
+        right_label:'출원인(AP)',can_use:st==='등록'&&dates.new7,
+        procurement_note:st==='등록'&&dates.new7?'✅ 조달 활용 가능':st==='출원'?'⚠ 출원중':`❌ ${st}`});
     });
-    return {list};
-  }catch(e){return {list:[],err:'파싱오류'};}
-}
-
-function normName(s){
-  return (s||'').replace(/[\(\)（）\s]/g,'')
-    .replace(/주식회사|㈜|\/주|\.주/g,'')
-    .replace(/[a-z]/g,c=>c.toUpperCase())
-    .toLowerCase();
+    return{list};
+  }catch(e){return{list:[]};}
 }
 
 async function searchAll(alias){
   const all=[];
-  for(const st of ['R','A','C','F','G']){
+  for(const st of['R','A','C','F','G']){
     const url=`${SRC}?${new URLSearchParams({ServiceKey:KEY,word:alias,year:'0',numOfRows:'30',pageNo:'1',registerStatus:st})}`;
     const xml=await fx(url);
-    const {list,limit}=parsePatents(xml,alias);
-    if(limit) break;
-    if(list) all.push(...list);
+    const{list,limit}=parseAll(xml,alias);
+    if(limit)break;
+    if(list)all.push(...list);
     await new Promise(r=>setTimeout(r,300));
   }
-
-  // 중복 제거
-  const seen=new Set(),all2=[];
-  all.forEach(p=>{const k=p.rn_raw||p.an; if(k&&!seen.has(k)){seen.add(k);all2.push(p);}});
-
-  if(!all2.length) return [];
-
-  // 출원인명 그룹핑 — 검색어와 가장 유사한 출원인 자동 선택
+  const seen=new Set(),u=[];
+  all.forEach(p=>{const k=p.rn_raw||p.an;if(k&&!seen.has(k)){seen.add(k);u.push(p);}});
+  // 출원인 그룹핑
   const nb=normName(alias);
-  const applCount={};
-  all2.forEach(p=>{
-    const key=p.appl||'';
-    applCount[key]=(applCount[key]||0)+1;
-  });
-
-  // 정규화된 이름이 검색어를 포함하거나, 검색어가 정규화된 이름을 포함하는 출원인 찾기
-  let bestAppl=null, bestScore=0;
-  Object.keys(applCount).forEach(appl=>{
-    const na=normName(appl);
-    let score=0;
-    if(na.includes(nb)||nb.includes(na)) score=100+applCount[appl];
-    else if(na.includes(nb.slice(0,Math.floor(nb.length*0.7)))) score=50+applCount[appl];
-    if(score>bestScore){bestScore=score;bestAppl=appl;}
-  });
-
-  // 매칭 출원인이 있으면 그것만, 없으면 전체 (노이즈 포함이지만 일단 보여줌)
-  const filtered = bestAppl
-    ? all2.filter(p=>p.appl===bestAppl || normName(p.appl).includes(nb) || nb.includes(normName(p.appl)))
-    : all2;
-
-  // 매칭 결과가 너무 적으면 검색어 포함된 모든 출원인 포함
-  const result = filtered.length>0 ? filtered : all2;
-
+  const filtered=u.filter(p=>normName(p.appl).includes(nb)||nb.includes(normName(p.appl)));
+  const result=filtered.length>0?filtered:u;
   result.sort((a,b)=>{
     const sp={등록:0,출원:1,'소멸/만료':2,포기:3,거절:4};
-    if(a.new7!==b.new7) return a.new7?-1:1;
-    if(sp[a.st]!==sp[b.st]) return sp[a.st]-sp[b.st];
-    return (b.rd||b.ad||'').localeCompare(a.rd||a.ad||'');
+    if(a.new7!==b.new7)return a.new7?-1:1;
+    if(sp[a.st]!==sp[b.st])return sp[a.st]-sp[b.st];
+    return(b.rd||b.ad||'').localeCompare(a.rd||a.ad||'');
   });
   return result;
 }
 
 async function fetchClaim(an){
-  if(!an) return {c1:'',eff:''};
+  if(!an)return{c1:'',eff:''};
   const url=`${DTL}?${new URLSearchParams({ServiceKey:KEY,applicationNumber:an})}`;
   const xml=await fx(url);
-  if(!xml||xml.startsWith('ERR')) return {c1:'',eff:''};
+  if(!xml||xml.startsWith('ERR'))return{c1:'',eff:''};
   try{
     const doc=new DOMParser().parseFromString(xml,'text/xml');
     let raw='';
-    for(const t of ['claimText','claim','clm','claimData','claims']){
-      const v=doc.querySelector(t)?.textContent?.trim()||'';
-      if(v){raw=v;break;}
+    for(const t of['claimText','claim','clm','claimData','claims']){
+      const v=doc.querySelector(t)?.textContent?.trim()||'';if(v){raw=v;break;}
     }
     let eff='';
-    for(const t of ['advantageousEffects','effect','effectsOfInvention','advEff']){
-      const v=doc.querySelector(t)?.textContent?.trim()||'';
-      if(v){eff=v;break;}
+    for(const t of['advantageousEffects','effect','effectsOfInvention']){
+      const v=doc.querySelector(t)?.textContent?.trim()||'';if(v){eff=v;break;}
     }
-    // 청구항 1항 전체 — 길이 제한 없음
     let c1='';
     if(raw){
-      const pats=[
-        /【청구항\s*1】\s*([\s\S]*?)(?=【청구항\s*2】|$)/,
+      const pats=[/【청구항\s*1】\s*([\s\S]*?)(?=【청구항\s*2】|$)/,
         /청구항\s*1[.：]\s*([\s\S]*?)(?=\n청구항\s*2|$)/,
-        /^\s*1[.)]\s+([\s\S]*?)(?=\n\s*2[.)]\s|$)/m,
-      ];
-      for(const pat of pats){
-        const m=raw.match(pat);
-        if(m&&m[1].trim()){c1=m[1].trim();break;}
-      }
-      if(!c1) c1=raw; // 패턴 없으면 전체
+        /^\s*1[.)]\s+([\s\S]*?)(?=\n\s*2[.)]\s|$)/m];
+      for(const pat of pats){const m=raw.match(pat);if(m&&m[1].trim()){c1=m[1].trim();break;}}
+      if(!c1)c1=raw;
     }
-    return {c1,eff};
-  }catch(e){return {c1:'',eff:''};}
+    return{c1,eff};
+  }catch(e){return{c1:'',eff:''};}
 }
 
 function analyzeComp(c1){
-  if(!c1) return {comps:[],tests:[],str:''};
+  if(!c1)return{comps:[],tests:[],str:''};
   const parts=c1.split(/[;；]/);
   const comps=[];
   parts.forEach(p=>{
-    p=p.trim();
-    if(p.length<5) return;
-    if(['을 포함하는','를 포함하는','에 있어서','로 이루어','이하 같다'].some(e=>p.includes(e))) return;
+    p=p.trim();if(p.length<5)return;
+    if(['을 포함하는','를 포함하는','에 있어서','로 이루어'].some(e=>p.includes(e)))return;
     const hi=HKW.some(k=>p.includes(k));
     comps.push({text:p,hi});
   });
   const tests=TMAP.filter(([kws])=>kws.some(k=>c1.includes(k))).map(([,t])=>t);
-  const hc=comps.filter(c=>c.hi).length;
-  const str=hc>=3?'🔥 강함':hc>=1?'✅ 보통':'⚠ 약함';
-  return {comps,tests,str};
+  return{comps,tests};
 }
 
 function copyText(text,el){
-  navigator.clipboard.writeText(text).then(()=>{
-    const o=el.innerHTML; el.innerHTML='✓ 복사됨!'; el.classList.add('copied');
+  (navigator.clipboard?.writeText(text)||Promise.reject()).then(()=>{
+    const o=el.innerHTML;el.innerHTML='✓ 복사됨!';el.classList.add('copied');
     setTimeout(()=>{el.innerHTML=o;el.classList.remove('copied');},2000);
   }).catch(()=>{
-    // fallback
-    const ta=document.createElement('textarea');
-    ta.value=text; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy');
+    const ta=document.createElement('textarea');ta.value=text;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');
     document.body.removeChild(ta);
-    const o=el.innerHTML; el.innerHTML='✓ 복사됨!'; el.classList.add('copied');
+    const o=el.innerHTML;el.innerHTML='✓ 복사됨!';el.classList.add('copied');
     setTimeout(()=>{el.innerHTML=o;el.classList.remove('copied');},2000);
   });
 }
 
-function makeCard(p,idx){
-  const usable=p.st==='등록'&&p.new7;
+function makeCard(p,idx,store){
+  const usable=p.can_use||(p.st==='등록'&&p.new7);
   const isApp=p.st==='출원';
   const isExp=['소멸/만료','포기','거절'].includes(p.st);
   const cc=usable?'card-usable':isApp?'card-app':isExp?'card-exp':'';
   const sb=usable?'<span class="badge b-green">✓ 7년미만 조달유력</span>':
     isApp?'<span class="badge b-amber">출원중</span>':
-    isExp?`<span class="badge b-red">${p.st}</span>`:'<span class="badge b-gray">7년 초과</span>';
+    isExp?`<span class="badge b-red">${p.st||p.patent_status}</span>`:'<span class="badge b-gray">7년 초과</span>';
+  const rl=p.right_label||'출원인(AP)';
+  const rBadge=rl.includes('RG')?'b-purple':rl.includes('TRH')?'b-green':rl.includes('EL')?'b-amber':'b-gray';
   const t=JSON.stringify;
-  return `<div class="patent-card ${cc}" id="pc${idx}">
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">${sb}</div>
-    <div class="ptitle">${p.title}</div>
+  const rd=p.rd||p.reg_date||'';
+  const ad=p.ad||p.app_date||'';
+  const exp=p.exp||p.expire_date||'';
+  const dl=p.dl||p.procurement_deadline||'-';
+  const yrs=p.yrs!=null?p.yrs:(p.years_passed!=null?p.years_passed:null);
+  const an=p.an||p.app_no||'';
+  const rno=p.reg_no||'';
+  const abs=p.abs||p.abstract||'';
+  const appl=p.appl||p.applicant||'';
+  const inv=p.inv||p.inventor||'';
+  const ipc=p.ipc||'';
+  const c1=p.claim1||'';
+  const eff=p.effect||'';
+  const comps=p.claim_components||[];
+  const tests=p.test_suggestions||[];
+
+  let claimHtml='';
+  if(c1){
+    const{comps:cc2,tests:tt}=analyzeComp(c1);
+    const compHtml=cc2.length?`<div class="comp-wrap"><div class="slabel">🔵 핵심 구성요소</div>
+      <div class="comp-list">${cc2.map(c=>`<div class="comp-item ${c.hi?'hi':'mi'}">
+        <span>${c.hi?'🔵':'⚪'}</span><span class="comp-text">${c.text}</span>
+        <span class="comp-badge ${c.hi?'cbh':'cbm'}">${c.hi?'핵심':'일반'}</span></div>`).join('')}</div></div>`:'';
+    const testHtml=tt.length?`<div class="test-wrap"><div class="slabel">🧪 시험 연결</div>
+      <div class="test-tags">${tt.map(t=>`<span class="test-tag">${t}</span>`).join('')}</div></div>`:'';
+    claimHtml=`<div class="claim-wrap"><div class="slabel">📋 청구항 1항 <span style="font-weight:400;font-size:10px;text-transform:none">— 전문</span></div>
+      <div class="claim-box" id="cl${store}${idx}">${c1}</div></div>${compHtml}${testHtml}`;
+    if(!claimStore[store]) claimStore[store]={};
+    claimStore[store][idx]={c1,comps:cc2};
+  } else {
+    claimHtml=`<div class="claim-wrap"><div class="slabel">📋 청구항 1항</div>
+      <div class="claim-box" id="cl${store}${idx}"><div class="claim-loading">⏳ 불러오는 중...</div></div></div>`;
+  }
+  const effHtml=eff?`<div class="effect-wrap"><div class="slabel">💡 발명의 효과</div>
+    <div class="effect-box">${eff}</div></div>`:'';
+
+  return `<div class="patent-card ${cc}" id="pc${store}${idx}">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+      ${sb}<span class="badge ${rBadge}">${rl}</span>
+    </div>
+    <div class="ptitle">${p.title||p.inventionTitle||''}</div>
     <div class="pmeta">
-      <div class="mitem"><div class="mlabel">등록번호</div><div class="mval">${p.reg_no||p.an||'-'}</div></div>
-      <div class="mitem"><div class="mlabel">등록일</div><div class="mval">${p.rd||'-'}</div></div>
-      <div class="mitem"><div class="mlabel">만료일 (등록+20년)</div><div class="mval ${usable?'vg':''}">${p.exp||'출원중'}</div></div>
-      <div class="mitem"><div class="mlabel">출원일</div><div class="mval">${p.ad||'-'}</div></div>
-      <div class="mitem"><div class="mlabel">경과년수</div><div class="mval">${p.yrs!=null?p.yrs+'년 경과':'-'}</div></div>
-      <div class="mitem"><div class="mlabel">조달 활용기한</div><div class="mval ${usable?'vg':'va'}">${p.dl||'-'}</div></div>
-      ${p.appl?`<div class="mitem"><div class="mlabel">출원인/권리자</div><div class="mval" style="font-size:11px">${p.appl}</div></div>`:''}
-      ${p.inv?`<div class="mitem"><div class="mlabel">발명자</div><div class="mval">${p.inv}</div></div>`:''}
-      ${p.ipc?`<div class="mitem"><div class="mlabel">IPC 분류</div><div class="mval" style="font-size:11px">${p.ipc.slice(0,50)}</div></div>`:''}
+      <div class="mitem"><div class="mlabel">등록번호</div><div class="mval">${rno||an||'-'}</div></div>
+      <div class="mitem"><div class="mlabel">등록일</div><div class="mval">${rd||'-'}</div></div>
+      <div class="mitem"><div class="mlabel">만료일 (등록+20년)</div><div class="mval ${usable?'vg':''}">${exp||'출원중'}</div></div>
+      <div class="mitem"><div class="mlabel">출원일</div><div class="mval">${ad||'-'}</div></div>
+      <div class="mitem"><div class="mlabel">경과년수</div><div class="mval">${yrs!=null?yrs+'년 경과':'-'}</div></div>
+      <div class="mitem"><div class="mlabel">조달 활용기한</div><div class="mval ${usable?'vg':'va'}">${dl}</div></div>
+      ${appl?`<div class="mitem"><div class="mlabel">출원인/권리자</div><div class="mval" style="font-size:11px">${appl}</div></div>`:''}
+      ${inv?`<div class="mitem"><div class="mlabel">발명자</div><div class="mval">${inv}</div></div>`:''}
+      ${ipc?`<div class="mitem"><div class="mlabel">IPC 분류</div><div class="mval" style="font-size:11px">${ipc.slice(0,50)}</div></div>`:''}
     </div>
-    ${p.abs?`<div class="slabel">📄 기술 요약 (초록)</div><div class="abstract-box">${p.abs}</div>`:''}
-    <div class="claim-wrap">
-      <div class="slabel">📋 청구항 1항 <span style="color:var(--text3);font-weight:400;font-size:10px;text-transform:none;letter-spacing:0">— 전문, 잘리지 않음</span></div>
-      <div class="claim-box" id="cl${idx}"><div class="claim-loading">⏳ 청구항 불러오는 중...</div></div>
-    </div>
-    <div class="comp-wrap" id="cw${idx}" style="display:none">
-      <div class="slabel">🔵 핵심 구성요소 (세미콜론 분석)</div>
-      <div class="comp-list" id="cc${idx}"></div>
-    </div>
-    <div class="test-wrap" id="tw${idx}" style="display:none">
-      <div class="slabel">🧪 시험 연결 제안</div>
-      <div class="test-tags" id="tt${idx}"></div>
-    </div>
-    <div class="effect-wrap" id="ew${idx}" style="display:none">
-      <div class="slabel">💡 발명의 효과</div>
-      <div class="effect-box" id="ef${idx}"></div>
-    </div>
+    ${abs?`<div class="slabel">📄 기술 요약 (초록)</div><div class="abstract-box">${abs}</div>`:''}
+    ${claimHtml}${effHtml}
     <div class="divider"></div>
     <div class="copy-row">
-      <button class="bcopy" onclick="copyText(${t(p.title)},this)">📋 특허명</button>
-      <button class="bcopy" onclick="copyText(${t(p.reg_no||p.an||'')},this)">📋 등록번호</button>
-      <button class="bcopy" onclick="copyText(${t(p.rd||p.ad||'')},this)">📋 등록일</button>
-      <button class="bcopy" onclick="copyText(${t(p.exp||'')},this)">📋 만료일</button>
-      <button class="bclaim" id="cb${idx}" style="display:none" onclick="copyStore(${idx})">⭐ 청구항1 전체 복사</button>
-      <button class="bcomp" id="co${idx}" style="display:none" onclick="copyComp(${idx})">📌 핵심구성 복사</button>
+      <button class="bcopy" onclick="copyText(${t(p.title||'')},this)">📋 특허명</button>
+      <button class="bcopy" onclick="copyText(${t(rno||an||'')},this)">📋 등록번호</button>
+      <button class="bcopy" onclick="copyText(${t(rd||ad||'')},this)">📋 등록일</button>
+      <button class="bcopy" onclick="copyText(${t(exp||'')},this)">📋 만료일</button>
+      ${c1?`<button class="bclaim" onclick="copyText(${t(c1)},this)">⭐ 청구항1 전체 복사</button>`:'<button class="bclaim" id="ccl${store}${idx}" style="display:none" onclick="copyClaimLive(\'${store}\',${idx})">⭐ 청구항1 전체 복사</button>'}
     </div>
   </div>`;
 }
 
-async function loadClaim(p,idx){
-  const clEl=document.getElementById(`cl${idx}`);
-  const cwEl=document.getElementById(`cw${idx}`);
-  const twEl=document.getElementById(`tw${idx}`);
-  const ewEl=document.getElementById(`ew${idx}`);
-  const cbBtn=document.getElementById(`cb${idx}`);
-  const coBtn=document.getElementById(`co${idx}`);
-  if(!clEl) return;
-
-  const {c1,eff}=await fetchClaim(p.an);
-  claimStore[idx]={c1,comps:[]};
-
+async function loadClaimLive(p,idx,store){
+  const clEl=document.getElementById(`cl${store}${idx}`);
+  const cclBtn=document.getElementById(`ccl${store}${idx}`);
+  if(!clEl)return;
+  const{c1,eff}=await fetchClaim(p.an);
+  if(!claimStore[store])claimStore[store]={};
+  claimStore[store][idx]={c1,comps:[]};
   if(c1){
-    clEl.textContent=c1; // textContent로 그대로 표시
-    cbBtn.style.display='flex';
-
-    const {comps,tests,str}=analyzeComp(c1);
-    claimStore[idx].comps=comps;
-
-    if(comps.length>0){
-      cwEl.style.display='block';
-      document.getElementById(`cc${idx}`).innerHTML=comps.map(c=>`
-        <div class="comp-item ${c.hi?'hi':'mi'}">
-          <span>${c.hi?'🔵':'⚪'}</span>
-          <span class="comp-text">${c.text}</span>
-          <span class="comp-badge ${c.hi?'cbh':'cbm'}">${c.hi?'핵심':'일반'}</span>
-        </div>`).join('');
-      coBtn.style.display='flex';
+    clEl.textContent=c1;
+    if(cclBtn)cclBtn.style.display='flex';
+    const{comps,tests}=analyzeComp(c1);
+    claimStore[store][idx].comps=comps;
+    const card=document.getElementById(`pc${store}${idx}`);
+    if(card&&comps.length){
+      const compWrap=document.createElement('div');
+      compWrap.className='comp-wrap';
+      compWrap.innerHTML=`<div class="slabel">🔵 핵심 구성요소</div>
+        <div class="comp-list">${comps.map(c=>`<div class="comp-item ${c.hi?'hi':'mi'}">
+          <span>${c.hi?'🔵':'⚪'}</span><span class="comp-text">${c.text}</span>
+          <span class="comp-badge ${c.hi?'cbh':'cbm'}">${c.hi?'핵심':'일반'}</span></div>`).join('')}</div>`;
+      clEl.closest('.claim-wrap').after(compWrap);
     }
-    if(tests.length>0){
-      twEl.style.display='block';
-      document.getElementById(`tt${idx}`).innerHTML=tests.map(t=>`<span class="test-tag">${t}</span>`).join('');
+    if(card&&tests.length){
+      const testWrap=document.createElement('div');
+      testWrap.className='test-wrap';
+      testWrap.innerHTML=`<div class="slabel">🧪 시험 연결</div>
+        <div class="test-tags">${tests.map(t=>`<span class="test-tag">${t}</span>`).join('')}</div>`;
+      card.querySelector('.comp-wrap')?.after(testWrap)||clEl.closest('.claim-wrap').after(testWrap);
     }
-    if(eff){
-      ewEl.style.display='block';
-      document.getElementById(`ef${idx}`).textContent=eff;
-    }
-  } else {
-    clEl.innerHTML=`<div class="claim-empty">이 특허의 청구항 정보를 불러오지 못했습니다.<br>출원 초기 단계이거나 KIPRIS 상세 정보가 아직 없을 수 있습니다.</div>`;
+  }else{
+    clEl.innerHTML='<div class="claim-empty">청구항 정보를 불러올 수 없습니다.</div>';
   }
 }
 
-function copyStore(idx){
-  const t=claimStore[idx]?.c1||'';
-  copyText(t,document.getElementById(`cb${idx}`));
-}
-function copyComp(idx){
-  const comps=claimStore[idx]?.comps||[];
-  const text=comps.map(c=>(c.hi?'[핵심] ':'')+c.text).join('\n');
-  copyText(text,document.getElementById(`co${idx}`));
+function copyClaimLive(store,idx){
+  const c1=claimStore[store]?.[idx]?.c1||'';
+  copyText(c1,document.getElementById(`ccl${store}${idx}`));
 }
 
 async function doSearch(){
   const alias=document.getElementById('inp').value.trim();
   if(!alias){alert('기업명을 입력해 주세요.');return;}
   const btn=document.getElementById('btn');
-  btn.disabled=true; btn.textContent='조회 중...';
-  Object.keys(claimStore).forEach(k=>delete claimStore[k]);
-
-  document.getElementById('area').innerHTML=`<div class="loading" style="margin-top:16px">
+  btn.disabled=true;btn.textContent='조회 중...';
+  document.getElementById('area').innerHTML=`<div class="loading">
     <div class="spinner"></div>
-    <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)">"${alias}" 특허 조회 중...</div>
-    <div class="pstep">KIPRIS 특허 데이터베이스 검색 중 (등록·출원·소멸 전체)</div>
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">"${alias}" KIPRIS 조회 중...</div>
+    <div style="font-size:12px;color:var(--text2)">등록·출원·소멸·포기 전체 검색 중</div>
   </div>`;
-
   try{
     const patents=await searchAll(alias);
     if(!patents.length){
-      document.getElementById('area').innerHTML=`<div class="empty" style="margin-top:16px">
-        <div class="empty-icon">🔍</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:6px;color:var(--text)">"${alias}" — 특허 없음</div>
+      document.getElementById('area').innerHTML=`<div class="empty">
+        <div style="font-size:36px;opacity:.3;margin-bottom:10px">🔍</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">"${alias}" — 특허 없음</div>
         <div style="font-size:12px;line-height:1.8">
-          KIPRIS 출원인명과 정확히 일치해야 합니다.<br>
+          KIPRIS 출원인명과 일치하지 않을 수 있습니다.<br>
           법인명 앞뒤 '주식회사', '(주)', '㈜' 등을 제외한 핵심 상호만 입력해 보세요.<br>
-          예) "주식회사 파이터코리아" → <strong>파이터코리아</strong>
+          더 정확한 조회는 <strong>Python 스크립트</strong>를 사용하세요.
         </div>
       </div>`;
       return;
     }
-
-    const reg=patents.filter(p=>p.st==='등록');
-    const app=patents.filter(p=>p.st==='출원');
     const yr7=patents.filter(p=>p.new7&&p.st==='등록');
+    const app=patents.filter(p=>p.st==='출원');
     const exp=patents.filter(p=>['소멸/만료','포기','거절'].includes(p.st));
-
+    const reg=patents.filter(p=>p.st==='등록');
     document.getElementById('area').innerHTML=`
       <div style="margin:16px 0 14px">
         <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px">"${alias}" 특허 현황</div>
-        <div style="font-size:11px;color:var(--text3)">KIPRIS 실시간 조회 · ${new Date().toLocaleDateString('ko-KR')} 기준 · 총 ${patents.length}건</div>
+        <div style="font-size:11px;color:var(--text3)">KIPRIS 실시간 · ${new Date().toLocaleDateString('ko-KR')} · 총 ${patents.length}건</div>
       </div>
       <div class="summary-row">
         <div class="scard"><div class="scard-n ng">${yr7.length}</div><div class="scard-l">7년미만 조달유력</div></div>
@@ -553,30 +926,81 @@ async function doSearch(){
         <div class="scard"><div class="scard-n na">${app.length}</div><div class="scard-l">출원중</div></div>
         <div class="scard"><div class="scard-n ngray">${exp.length}</div><div class="scard-l">소멸/만료</div></div>
       </div>
-      <div class="status-bar" id="sbar"><span class="status-dot"></span> 청구항 1항 불러오는 중... (0/${patents.filter(p=>p.st==='등록'||p.st==='출원').length}건)</div>
-      <div id="pcont">${patents.map((p,i)=>makeCard(p,i)).join('')}</div>`;
-
-    // 청구항 순차 로드
+      <div class="status-bar" id="sbar"><span class="sdot"></span> 청구항 1항 불러오는 중...</div>
+      <div id="pcont">${patents.map((p,i)=>makeCard(p,i,'live')).join('')}</div>`;
     const targets=patents.filter(p=>p.st==='등록'||p.st==='출원');
     for(let i=0;i<targets.length;i++){
-      const p=targets[i];
-      const idx=patents.indexOf(p);
-      const sbar=document.getElementById('sbar');
-      if(sbar) sbar.innerHTML=`<span class="status-dot"></span> 청구항 1항 불러오는 중... (${i+1}/${targets.length}건) — ${p.title.slice(0,30)}...`;
-      await loadClaim(p,idx);
+      const p=targets[i];const idx=patents.indexOf(p);
+      const sb=document.getElementById('sbar');
+      if(sb)sb.innerHTML=`<span class="sdot"></span> 청구항 ${i+1}/${targets.length} — ${p.title.slice(0,30)}...`;
+      await loadClaimLive(p,idx,'live');
       await new Promise(r=>setTimeout(r,400));
     }
-    const sbar=document.getElementById('sbar');
-    if(sbar){sbar.innerHTML='✅ 청구항 1항 로드 완료';sbar.style.color='var(--green)';sbar.querySelector('.status-dot')?.remove();}
-
+    const sb=document.getElementById('sbar');
+    if(sb){sb.style.color='var(--green)';sb.innerHTML='✅ 청구항 1항 로드 완료';}
   }catch(e){
-    document.getElementById('area').innerHTML=`<div style="background:var(--red-bg);border:1px solid var(--red-bd);border-radius:var(--r);padding:16px;color:var(--red);font-size:13px;margin-top:16px">오류: ${e.message}</div>`;
-  }finally{
-    btn.disabled=false; btn.textContent='특허 조회';
-  }
+    document.getElementById('area').innerHTML=`<div style="background:var(--red-bg);border:1px solid var(--red-bd);border-radius:var(--r);padding:16px;color:var(--red);margin-top:16px">오류: ${e.message}</div>`;
+  }finally{btn.disabled=false;btn.textContent='특허 조회';}
 }
 
-function quick(name){document.getElementById('inp').value=name;doSearch();}
+// ── JSON 업로드 ──────────────────────────────────
+let jsonData=null;
+
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragover');
+  const f=e.dataTransfer.files[0];
+  if(f&&f.name.endsWith('.json'))loadJson(f);
+}
+
+function loadJson(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      jsonData=JSON.parse(e.target.result);
+      const withP=jsonData.filter(d=>d.patents&&d.patents.length>0);
+      // 업체 선택 버튼
+      document.getElementById('drop-zone').innerHTML=`
+        <div style="font-size:14px;font-weight:600;color:var(--green);margin-bottom:4px">✅ ${file.name} 로드 완료</div>
+        <div style="font-size:12px;color:var(--text2)">${jsonData.length}개사 · 특허있는 업체 ${withP.length}개사</div>`;
+      document.getElementById('co-picker-wrap').style.display='block';
+      document.getElementById('co-picker').innerHTML=withP.map(d=>`
+        <div class="co-btn" onclick="showCompanyJson('${d.name.replace(/'/g,"\\'")}')">
+          <div class="co-btn-name">${d.name}</div>
+          <div class="co-btn-sub">특허 ${d.summary?.전체||d.patents.length}건 · 7년미만 ${d.summary?.['7년미만']||d.summary?.조달활용||0}건</div>
+        </div>`).join('');
+    }catch(err){
+      alert('JSON 파일 형식이 올바르지 않습니다: '+err.message);
+    }
+  };
+  reader.readAsText(file,'utf-8');
+}
+
+function showCompanyJson(name){
+  document.querySelectorAll('.co-btn').forEach(b=>b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const d=jsonData.find(x=>x.name===name);
+  if(!d)return;
+  const patents=d.patents||[];
+  const yr7=patents.filter(p=>p.is_new_7yr&&p.patent_status==='등록');
+  const app=patents.filter(p=>p.patent_status==='출원');
+  const exp=patents.filter(p=>['소멸/만료','포기','거절'].includes(p.patent_status));
+  const reg=patents.filter(p=>p.patent_status==='등록');
+  document.getElementById('json-area').innerHTML=`
+    <div style="margin-bottom:14px;padding-top:4px">
+      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px">${d.name}</div>
+      <div style="font-size:11px;color:var(--text3)">${(d.cert||[]).join(' · ')} · ${d.memo||''}</div>
+    </div>
+    <div class="summary-row">
+      <div class="scard"><div class="scard-n ng">${yr7.length}</div><div class="scard-l">7년미만 조달유력</div></div>
+      <div class="scard"><div class="scard-n nb">${reg.length}</div><div class="scard-l">등록 특허</div></div>
+      <div class="scard"><div class="scard-n na">${app.length}</div><div class="scard-l">출원중</div></div>
+      <div class="scard"><div class="scard-n ngray">${exp.length}</div><div class="scard-l">소멸/만료</div></div>
+    </div>
+    <div id="jpcont">${patents.map((p,i)=>makeCard(p,i,'json')).join('')}</div>`;
+}
+
 document.getElementById('inp')?.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
 </script>
 </body>
