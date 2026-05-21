@@ -833,18 +833,57 @@ async function fetchClaim(an){
   }catch(e){return{c1:'',eff:''};}
 }
 
-function analyzeComp(c1){
-  if(!c1)return{comps:[],tests:[],str:''};
-  const parts=c1.split(/[;；]/);
-  const comps=[];
-  parts.forEach(p=>{
-    p=p.trim();if(p.length<5)return;
-    if(['을 포함하는','를 포함하는','에 있어서','로 이루어'].some(e=>p.includes(e)))return;
-    const hi=HKW.some(k=>p.includes(k));
-    comps.push({text:p,hi});
+// 기술 명사 패턴 (부품/장치 명사)
+const TECH_PATTERN=/[가-힣a-zA-Z0-9]+(?:부|기|장치|모듈|유닛|시스템|필터|밸브|센서|모터|펌프|탱크|라인|패드|스위치|제어기|발생기|검출기|감지기|공급기|충전기|배출기|수납함|보관함|케이스|커버|클램프|수납장|관리시스템|모니터링장치|충격기|보호구|헬멧|마스크|호흡기|정화통)/g;
+const SKIP_COMP=['을 포함하는','를 포함하는','에 있어서','로 이루어','이하 같다','포함하되','특징으로 하는','를 포함하고'];
+
+function extractKeywords(text){
+  // 기술 명사 추출
+  const found=(text.match(TECH_PATTERN)||[]);
+  const seen=new Set();
+  return found.filter(k=>{
+    if(k.length<3||/^\d/.test(k)||seen.has(k))return false;
+    seen.add(k);return true;
   });
+}
+
+function analyzeComp(c1){
+  if(!c1)return{comps:[],keywords:[],tests:[]};
   const tests=TMAP.filter(([kws])=>kws.some(k=>c1.includes(k))).map(([,t])=>t);
-  return{comps,tests};
+  const scCount=(c1.match(/;/g)||[]).length;
+
+  // 전체 키워드 추출 (세미콜론 여부 무관)
+  const keywords=extractKeywords(c1);
+
+  if(scCount>=2){
+    // 세미콜론 구성요소 분리
+    const comps=[];
+    c1.split(/;/).forEach(part=>{
+      part=part.trim();
+      if(part.length<8)return;
+      if(SKIP_COMP.some(s=>part===s||part.endsWith(s)&&part.length<15))return;
+      // 핵심명사 추출
+      const kws=extractKeywords(part);
+      const label=kws.length>0?kws[0]:part.slice(0,20).replace(/^상기\s+/,'');
+      comps.push({text:part, label, keywords:kws});
+    });
+    return{comps,keywords,tests};
+  }
+
+  // 세미콜론 없으면 comps 빈 배열, keywords만 반환
+  return{comps:[],keywords,tests};
+}
+
+// 청구항 텍스트에 키워드 하이라이트 적용
+function highlightClaim(c1,keywords){
+  if(!keywords||keywords.length===0)return c1;
+  let html=c1.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  keywords.forEach(kw=>{
+    const escaped=kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    html=html.replace(new RegExp(escaped,'g'),
+      `<strong style="color:var(--blue);background:rgba(59,130,246,.08);border-radius:2px;padding:0 2px">${kw}</strong>`);
+  });
+  return html;
 }
 
 function copyText(text,el){
@@ -890,14 +929,42 @@ function makeCard(p,idx,store){
   let claimHtml='';
   if(c1){
     const{comps:cc2,tests:tt}=analyzeComp(c1);
-    const compHtml=cc2.length?`<div class="comp-wrap"><div class="slabel">🔵 핵심 구성요소</div>
-      <div class="comp-list">${cc2.map(c=>`<div class="comp-item ${c.hi?'hi':'mi'}">
-        <span>${c.hi?'🔵':'⚪'}</span><span class="comp-text">${c.text}</span>
-        <span class="comp-badge ${c.hi?'cbh':'cbm'}">${c.hi?'핵심':'일반'}</span></div>`).join('')}</div></div>`:'';
-    const testHtml=tt.length?`<div class="test-wrap"><div class="slabel">🧪 시험 연결</div>
+    const{comps:cc2,tests:tt2}=analyzeComp(c1);
+    const compHtml=cc2.length?`
+      <div style="margin-bottom:14px">
+        <div class="slabel">🔵 핵심 구성요소 <span style="font-weight:400;font-size:10px;text-transform:none;color:var(--text3)">(세미콜론 기준 자동 분리)</span></div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${cc2.map((c,i)=>`
+            <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:6px">
+              <span style="color:var(--blue);font-weight:700;font-size:13px;flex-shrink:0">${i+1}</span>
+              <span style="color:var(--text);font-size:12px;line-height:1.6;flex:1">${c.text}</span>
+              <button class="bcopy" style="flex-shrink:0;font-size:11px;padding:3px 8px" onclick="copyText(${JSON.stringify(c.text)},this)">복사</button>
+            </div>`).join('')}
+        </div>
+      </div>`:'';
+    const testHtml=tt2.length?`<div class="test-wrap"><div class="slabel">🧪 시험 연결</div>
       <div class="test-tags">${tt.map(t=>`<span class="test-tag">${t}</span>`).join('')}</div></div>`:'';
+    const{comps:cc2,keywords:kws2,tests:tt2x}=analyzeComp(c1);
+    const claimHtml2=cc2.length===0?highlightClaim(c1,kws2):c1; // 세미콜론 없으면 하이라이트
+    const compHtml2=cc2.length?`
+      <div style="margin-bottom:14px">
+        <div class="slabel">🔵 핵심 구성요소 <span style="font-weight:400;font-size:10px;text-transform:none;color:var(--text3)">(세미콜론 기준 분리)</span></div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${cc2.map((c,i)=>`
+            <div style="display:flex;align-items:flex-start;gap:8px;padding:9px 12px;background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:6px">
+              <span style="color:var(--blue);font-weight:700;font-size:14px;flex-shrink:0;min-width:20px">${i+1}</span>
+              <span style="color:var(--text);font-size:12px;line-height:1.7;flex:1">${
+                c.keywords.length>0
+                  ? c.text.replace(new RegExp('('+c.keywords.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g'),
+                      '<strong style="color:var(--blue);background:rgba(59,130,246,.1);border-radius:2px;padding:0 2px">$1</strong>')
+                  : c.text
+              }</span>
+              <button class="bcopy" style="flex-shrink:0;font-size:11px;padding:3px 8px" onclick="copyText(${JSON.stringify(c.text)},this)">복사</button>
+            </div>`).join('')}
+        </div>
+      </div>`:'';
     claimHtml=`<div class="claim-wrap"><div class="slabel">📋 청구항 1항 <span style="font-weight:400;font-size:10px;text-transform:none">— 전문</span></div>
-      <div class="claim-box" id="cl${store}${idx}">${c1}</div></div>${compHtml}${testHtml}`;
+      <div class="claim-box" id="cl${store}${idx}">${cc2.length>0?c1:claimHtml2}</div></div>${compHtml2}${testHtml}`;
     if(!claimStore[store]) claimStore[store]={};
     claimStore[store][idx]={c1,comps:cc2};
   } else {
@@ -961,13 +1028,32 @@ async function loadClaimLive(p,idx,store){
     const{comps,tests}=analyzeComp(c1);
     claimStore[store][idx].comps=comps;
     const card=document.getElementById(`pc${store}${idx}`);
+    const{comps,keywords,tests}=analyzeComp(c1);
+
+    // 청구항 텍스트 — 세미콜론 없으면 키워드 하이라이트
+    if(comps.length===0&&keywords.length>0){
+      clEl.innerHTML=highlightClaim(c1,keywords);
+    } else {
+      clEl.textContent=c1;
+    }
+
+    // 세미콜론 구성요소 목록
     if(card&&comps.length){
       const compWrap=document.createElement('div');
-      compWrap.className='comp-wrap';
-      compWrap.innerHTML=`<div class="slabel">🔵 핵심 구성요소</div>
-        <div class="comp-list">${comps.map(c=>`<div class="comp-item ${c.hi?'hi':'mi'}">
-          <span>${c.hi?'🔵':'⚪'}</span><span class="comp-text">${c.text}</span>
-          <span class="comp-badge ${c.hi?'cbh':'cbm'}">${c.hi?'핵심':'일반'}</span></div>`).join('')}</div>`;
+      compWrap.style.marginBottom='14px';
+      compWrap.innerHTML=`<div class="slabel">🔵 핵심 구성요소 <span style="font-weight:400;font-size:10px;text-transform:none;color:var(--text3)">(세미콜론 기준)</span></div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${comps.map((c,i)=>`
+            <div style="display:flex;align-items:flex-start;gap:8px;padding:9px 12px;background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:6px">
+              <span style="color:var(--blue);font-weight:700;font-size:14px;flex-shrink:0;min-width:20px">${i+1}</span>
+              <span style="color:var(--text);font-size:12px;line-height:1.7;flex:1">${
+                c.keywords&&c.keywords.length>0
+                  ? c.text.replace(new RegExp('('+c.keywords.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g'),
+                      '<strong style="color:var(--blue);background:rgba(59,130,246,.1);border-radius:2px;padding:0 2px">$1</strong>')
+                  : c.text
+              }</span>
+            </div>`).join('')}
+        </div>`;
       clEl.closest('.claim-wrap').after(compWrap);
     }
     if(card&&tests.length){
