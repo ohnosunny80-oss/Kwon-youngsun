@@ -574,7 +574,7 @@ function showDet(c){
   h+='<div class="sec" style="text-align:center"><a class="growbtn" href="'+GROWMAPS+'" target="_blank">🗺 GrowMaps 실측 부스맵 열기</a></div>';
 
   det.innerHTML=h;
-  if(window.innerWidth<=768){det.classList.add('open');det.scrollTop=0;}
+  if(window.innerWidth<=768){openSheet();det.scrollTop=0;}
   if(c.dm&&c.pn)fetchAI(c,'ai-'+b);
 }
 
@@ -602,7 +602,9 @@ function startWhisper(b){
 }
 
 /* ---------- stats ---------- */
-function closeDet(){var d=document.getElementById('det');if(d)d.classList.remove('open');}
+function openSheet(){var d=document.getElementById('det');if(d&&!d.classList.contains('open')){d.classList.add('open');try{history.pushState({sheet:1},'');}catch(e){}}}
+function closeDet(){var d=document.getElementById('det');if(d&&d.classList.contains('open')){try{history.back();}catch(e){d.classList.remove('open');}}}
+window.addEventListener('popstate',function(){var d=document.getElementById('det');if(d&&d.classList.contains('open'))d.classList.remove('open');});
 function showTab(btn,v){closeDet();var a=document.querySelectorAll('.view');for(var i=0;i<a.length;i++)a[i].classList.remove('on');var t=document.querySelectorAll('.tab');for(i=0;i<t.length;i++)t[i].classList.remove('on');document.getElementById(v+'View').classList.add('on');btn.classList.add('on');if(v==='stats')renderStats();if(v==='list')renderList();if(v==='map')setTimeout(function(){measureStage();if(!FITTED){stageFit('all');FITTED=true;}else{clampStage();stageApply();}},40);}
 function renderStats(){
   var total=CO.length,dm=0,vis=0,card=0,visPat=0,visProc=0;
@@ -632,7 +634,41 @@ function renderStats(){
   h+='<div class="shd">📮 방문한 DM업체 등급별</div><div class="vl"><div class="vr" style="flex-direction:row;gap:10px;flex-wrap:wrap">';
   for(var g in byg){h+='<span class="tag" style="background:'+GC[g]+';color:#fff">'+g+' '+byg[g]+'</span>';}
   h+='</div></div>';
-  document.getElementById('statsInner').innerHTML=h+'<button onclick="genReport()" style="width:100%;padding:14px;background:#0d47a1;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">🤖 AI 상담결과 보고서 생성</button>';
+  document.getElementById('statsInner').innerHTML=h+'<button onclick="exportData()" style="width:100%;padding:14px;background:#00897b;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px">📤 상담기록 내보내기 (엑셀·백업)</button><button onclick="restoreData()" style="width:100%;padding:12px;background:#fff;border:1.5px solid #f9a825;color:#e65100;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px">📥 백업코드로 복원</button><button onclick="genReport()" style="width:100%;padding:14px;background:#0d47a1;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">🤖 AI 상담결과 보고서 생성</button>';
+}
+function csvEsc(s){s=(s==null?'':String(s));if(/[",\n]/.test(s))s='"'+s.replace(/"/g,'""')+'"';return s;}
+function exportData(){
+  var recs=[];
+  for(var i=0;i<CO.length;i++){var c=CO[i],b=c.b;var memo=(STATE.n[b]||{}).x||'';
+    if(!isVis(b)&&!hasCard(b)&&!memo)continue;
+    recs.push([b,c.n,c.en||'',c.g||'',(c.cats||[]).join('/'),isVis(b)?'Y':'',(STATE.v[b]||{}).t||'',hasCard(b)?'Y':'',(STATE.card[b]||{}).t||'',memo,c.dm?'Y':'',c.p7||'',c.pt||'',c.certs?Object.keys(c.certs).join(' '):'',c.spmm||'',c.pamt||0]);
+  }
+  var head=['부스','회사명','영문명','등급','분야','방문','방문시간','명함','명함시간','메모','DM발송','7년특허','전체특허','인증','세부품명','조달실적'];
+  var csv=[head.join(',')].concat(recs.map(function(r){return r.map(csvEsc).join(',');})).join('\n');
+  var d=new Date(),p=function(n){return ('0'+n).slice(-2);};
+  var fn='상담기록_'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes())+'.csv';
+  var m=document.createElement('div');m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;flex-direction:column';
+  m.innerHTML='<div style="background:#0d47a1;padding:14px 16px;display:flex;justify-content:space-between;align-items:center"><b style="color:#fff;font-size:14px">📤 상담기록 내보내기 ('+recs.length+'곳)</b><button onclick="this.closest(\'div\').parentNode.remove()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 12px;border-radius:5px;cursor:pointer">✕ 닫기</button></div>'
+    +'<div style="padding:12px;background:#1a1a1a;display:flex;gap:8px;flex-wrap:wrap"><button id="ecp" style="flex:1;min-width:88px;padding:13px;background:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer">📋 복사</button><button id="ebk" style="flex:1;min-width:88px;padding:13px;background:#f9a825;color:#111;border:none;border-radius:8px;font-weight:700;cursor:pointer">🔐 백업코드</button><button id="edl" style="flex:1;min-width:88px;padding:13px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer">💾 파일</button></div>'
+    +'<div style="font-size:11px;color:#bbb;padding:0 14px 8px">📋 복사=엑셀용 · 🔐 백업코드=카톡으로 나에게 보내두면 초기화돼도 복원 가능 · 💾 파일=CSV 저장</div>'
+    +'<textarea id="etx" style="flex:1;margin:0 12px 12px;border-radius:8px;padding:10px;font-size:11px;font-family:monospace;border:none" readonly></textarea>';
+  document.body.appendChild(m);
+  if(!recs.length){document.getElementById('etx').value='아직 방문·명함·메모 기록이 없습니다.';return;}
+  document.getElementById('etx').value=csv;
+  document.getElementById('ecp').onclick=function(){var t=document.getElementById('etx');t.focus();t.select();var ok=false;try{document.execCommand('copy');ok=true;}catch(e){}if(navigator.clipboard){navigator.clipboard.writeText(csv).catch(function(){});ok=true;}document.getElementById('ecp').textContent=ok?'✅ 복사됨':'복사 실패';};
+  document.getElementById('edl').onclick=function(){try{var blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);}catch(e){alert('저장이 안 되면 📋 복사를 이용하세요');}};
+  document.getElementById('ebk').onclick=function(){var code='KOPC1'+JSON.stringify(STATE);var t=document.getElementById('etx');t.value=code;t.focus();t.select();var ok=false;try{document.execCommand('copy');ok=true;}catch(e){}if(navigator.clipboard){navigator.clipboard.writeText(code).catch(function(){});ok=true;}document.getElementById('ebk').textContent='✅ 백업코드 복사됨';alert('백업코드가 복사됐습니다.\n카톡으로 "나에게" 보내두세요.\n혹시 기록이 초기화되면 통계 탭의 📥 복원에 이 코드를 붙여넣으면 되살아납니다.');};
+}
+function restoreData(){
+  var s=prompt('백업코드를 붙여넣고 확인을 누르세요 (카톡에 보내둔 KOPC1... 코드)');
+  if(!s)return; s=s.trim(); if(s.indexOf('KOPC1')===0)s=s.slice(5);
+  try{var d=JSON.parse(s);
+    if(d.v)for(var k in d.v)STATE.v[k]=d.v[k];
+    if(d.n)for(var k2 in d.n)STATE.n[k2]=d.n[k2];
+    if(d.card)for(var k3 in d.card)STATE.card[k3]=d.card[k3];
+    saveLocal();push();rebuildMaps();renderStats();
+    alert('복원 완료 ✓  방문 '+Object.keys(STATE.v).length+'곳 · 명함 '+Object.keys(STATE.card).length+'곳');
+  }catch(e){alert('코드 형식이 올바르지 않습니다. 복사한 KOPC1... 코드 전체를 붙여넣어 주세요.');}
 }
 function genReport(){
   var vb=[];for(var b in STATE.v)if(isVis(b))vb.push(b);
