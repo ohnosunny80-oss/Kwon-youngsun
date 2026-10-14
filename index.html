@@ -13,7 +13,12 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#12
 #top{position:fixed;top:0;left:0;right:0;min-height:50px;background:#1B2A5C;display:flex;align-items:center;gap:8px;padding:6px 12px;z-index:999;flex-wrap:wrap}
 #top h1{font-size:14px;font-weight:800;color:#fff;white-space:nowrap}
 #me{font-size:12px;font-weight:700;color:#fff;background:rgba(255,255,255,.16);padding:3px 9px;border-radius:6px}
-#srch{padding:5px 10px;border-radius:6px;border:none;font-size:13px;width:150px;outline:none;background:rgba(255,255,255,.16);color:#fff;font-family:inherit}
+#srchdrop{display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:#fff;color:#111;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.35);max-height:60vh;overflow-y:auto;z-index:2000}
+#srchdrop .sr{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:13px}
+#srchdrop .sr b{font-size:14px;color:#1B2A5C;min-width:46px}
+#srchdrop .sr .dot{width:12px;height:12px;border-radius:50%;flex:none}
+#srchdrop .sr small{color:#888;margin-left:auto;white-space:nowrap}
+#srch{padding:5px 10px;border-radius:6px;border:none;font-size:13px;width:220px;outline:none;background:rgba(255,255,255,.16);color:#fff;font-family:inherit}
 #srch::placeholder{color:rgba(255,255,255,.55)}
 .fbar{display:flex;gap:4px;flex-wrap:wrap}
 .fb{font-size:11px;padding:3px 9px;border-radius:99px;border:1.5px solid rgba(255,255,255,.35);background:transparent;color:#fff;cursor:pointer;white-space:nowrap;font-family:inherit}
@@ -173,7 +178,7 @@ details.sec:not([open]) summary::after{content:'▸'}
 <div id="top">
   <h1>2026 한국건설·안전박람회</h1>
   <span id="me">👤 권영선</span>
-  <input id="srch" placeholder="업체명·부스 검색" oninput="onSearch()">
+  <div id="srchwrap" style="position:relative;display:flex;flex:1;min-width:0"><input id="srch" placeholder="🔍 업체명·부스번호 (예: I086, i86)" oninput="onSearch()" onkeydown="if(event.key==='Enter')searchGo()" onfocus="onSearch()" autocomplete="off"><div id="srchdrop"></div></div>
   <div class="fbar">
     <button class="fb on" onclick="setF(this,'all')">전체</button>
     <button class="fb" onclick="setF(this,'dm')">📮 DM 84</button>
@@ -209,7 +214,8 @@ details.sec:not([open]) summary::after{content:'▸'}
         <div class="li"><div class="lb" style="background:#ef6c00"></div>2순위</div>
         <div class="li"><div class="lb" style="background:#f9a825"></div>3순위</div>
         <div class="li"><div class="lb" style="background:#5c6bc0"></div>참가사(DM외)</div>
-        <div class="li"><div class="lb" style="background:#2e7d32"></div>방문완료</div>
+        <div class="li"><div class="lb" style="background:#2e7d32"></div>✓ 방문완료</div>
+        <div class="li"><div class="lb" style="background:#5c6bc0;outline:1.5px dashed #fff;outline-offset:-3px"></div>열어봄(미방문)</div>
         <div class="li"><div class="lb" style="background:#fff;border:1px solid #9fb0d0"></div>타전시·미등록</div>
         <div class="li">★ 7년미만 본인특허 · ● 등록특허 보유</div>
         <div class="li">🏆 수상기업</div>
@@ -237,13 +243,13 @@ var TC={1:'#c62828',2:'#ef6c00',3:'#f9a825'};
 var TN={1:'1순위',2:'2순위',3:'3순위'};
 var byB={}, byId={}; for(var i=0;i<CO.length;i++){byId[CO[i].id]=CO[i]; if(CO[i].b&&!byB[CO[i].b])byB[CO[i].b]=CO[i];}
 var FILT='all', SEL='';   /* SEL = company id */
-var STATE={v:{},n:{},card:{},ok:{}};
+var STATE={v:{},n:{},card:{},ok:{},s:{}};
 var BIN='', MKEY='', AKEY='';
 try{BIN=localStorage.getItem('kcs26_bin')||'';MKEY=localStorage.getItem('kcs26_mkey')||'';AKEY=localStorage.getItem('kcs26_akey')||'';}catch(e){}
 
 /* ---------- storage (키는 코드에 넣지 않음 — 기기에만 저장) ---------- */
 function saveLocal(){try{localStorage.setItem('kcs26_data',JSON.stringify(STATE));}catch(e){}}
-function loadLocal(){try{var s=localStorage.getItem('kcs26_data');if(s){var d=JSON.parse(s);STATE.v=d.v||{};STATE.n=d.n||{};STATE.card=d.card||{};STATE.ok=d.ok||{};}}catch(e){}}
+function loadLocal(){try{var s=localStorage.getItem('kcs26_data');if(s){var d=JSON.parse(s);STATE.v=d.v||{};STATE.n=d.n||{};STATE.card=d.card||{};STATE.ok=d.ok||{};STATE.s=d.s||{};}}catch(e){}}
 function syncLabel(t){document.getElementById('sync').textContent=t;}
 function push(){saveLocal();if(!BIN||!MKEY)return;
   fetch('https://api.jsonbin.io/v3/b/'+BIN,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MKEY},body:JSON.stringify(STATE)}).catch(function(){});}
@@ -280,7 +286,7 @@ function pass(c){
   if(FILT==='cert')return hasCert(c);
   return true;
 }
-function matchQ(c,sq){return !sq||((c.b||'')+(c.n||'')+(c.en||'')+(c.spm||'')+(c.i||'')).toLowerCase().indexOf(sq)>=0;}
+function matchQ(c,sq){if(!sq)return true;var nb=normB(sq);if(nb&&c.b===nb)return true;return ((c.b||'')+(c.n||'')+(c.en||'')+(c.spm||'')+(c.i||'')).toLowerCase().indexOf(sq)>=0;}
 
 /* ---------- map (배치도 이미지 + SVG 오버레이) ---------- */
 var NS='http://www.w3.org/2000/svg';
@@ -312,6 +318,7 @@ function rebuildMaps(){
     if(c.p7&&parseInt(c.p7)>0){grp.appendChild(tx('★',{x:x+4,y:y+6.5,'text-anchor':'middle','font-size':6,fill:'#fff',opacity:op}));}
     else if(hasPat(c)){grp.appendChild(el('circle',{cx:x+4,cy:y+4,r:1.8,fill:'#fff',opacity:op}));}
     if(isVis(c.id))grp.appendChild(tx('✓',{x:x+w-4,y:y+6,'text-anchor':'middle','font-size':6,'font-weight':900,fill:'#fff',opacity:op}));
+    else if(STATE.s[c.id])grp.appendChild(el('rect',{x:x+1,y:y+1,width:w-2,height:h-2,fill:'none',stroke:'#fff',rx:1.2,'stroke-width':1.6,'stroke-dasharray':'2 1.2',opacity:op}));
     if(hasCard(c.id))grp.appendChild(el('rect',{x:x,y:y+h-3,width:7,height:3,fill:'#ffd54f',opacity:op}));
     if(FILT==='route'&&c.rt&&show){grp.appendChild(el('circle',{cx:x+w-6,cy:y+6,r:5.5,fill:'#fff',stroke:f,'stroke-width':1}));grp.appendChild(tx(String(c.rt),{x:x+w-6,y:y+8.3,'text-anchor':'middle','font-size':6,'font-weight':900,fill:f}));}
     if(c.aw)grp.appendChild(tx('🏆',{x:x+5,y:y+h-2,'text-anchor':'middle','font-size':5,opacity:op}));
@@ -400,6 +407,7 @@ function initGestures(){
 }
 function openBooth(id){
   SEL=id; var c=byId[id];
+  if(!STATE.s[id]){STATE.s[id]={t:now()};saveLocal();}
   var tabs=document.querySelectorAll('.tab');tabs.forEach(function(t){t.classList.remove('on');});
   var views=document.querySelectorAll('.view');views.forEach(function(v){v.classList.remove('on');});
   document.getElementById('mapView').classList.add('on');if(tabs[0])tabs[0].classList.add('on');
@@ -454,15 +462,29 @@ function renderList(){
   document.getElementById('listInner').innerHTML=html||'<div style="color:#999;text-align:center;padding:40px">해당 조건의 업체가 없습니다</div>';
 }
 function setF(btn,f){FILT=f;var a=document.querySelectorAll('.fb');for(var i=0;i<a.length;i++)a[i].classList.remove('on');btn.classList.add('on');rebuildMaps();if(document.getElementById('listView').classList.contains('on'))renderList();}
+function normB(q){var v=q.toUpperCase().replace(/\s/g,'');var m=v.match(/^([A-M])-?0*(\d{1,3})$/);return m?m[1]+('00'+m[2]).slice(-3):null;}
+function searchMatches(sq){
+  var out=[];if(!sq)return out;
+  var nb=normB(sq);
+  if(nb&&byB[nb])out.push(byB[nb]);
+  for(var i=0;i<CO.length&&out.length<12;i++){var c=CO[i];if(out.indexOf(c)<0&&matchQ(c,sq.toLowerCase()))out.push(c);}
+  return out;
+}
 function onSearch(){
-  var sq=document.getElementById('srch').value.toLowerCase().trim();
-  var found=null;
-  if(sq.length>=1){for(var i=0;i<CO.length;i++){var c=CO[i];if(matchQ(c,sq)){found=c;break;}}}
-  if(found)SEL=found.id;
+  var sq=document.getElementById('srch').value.trim();
+  var dd=document.getElementById('srchdrop');
   rebuildMaps();
   if(document.getElementById('listView').classList.contains('on'))renderList();
-  if(found){showDet(found);if(found.b)setTimeout(function(){focusBooth(found.b);},70);}
+  if(!sq){dd.style.display='none';dd.innerHTML='';return;}
+  var ms=searchMatches(sq);
+  if(!ms.length){dd.innerHTML='<div class="sr" style="color:#999">일치하는 업체·부스 없음</div>';dd.style.display='block';return;}
+  dd.innerHTML=ms.map(function(c){return '<div class="sr" onclick="pickSearch(\''+c.id+'\')"><span class="dot" style="background:'+fillOf(c)+'"></span><b>'+esc(c.b||'미확인')+'</b><span>'+esc(c.n)+(isVis(c.id)?' <span style="color:#2e7d32;font-weight:700">✓방문</span>':'')+'</span><small>'+(c.t?TN[c.t]:'')+'</small></div>';}).join('');
+  dd.style.display='block';
 }
+function pickSearch(id){var dd=document.getElementById('srchdrop');dd.style.display='none';var s=document.getElementById('srch');s.value='';s.blur();openBooth(id);}
+function searchGo(){var sq=document.getElementById('srch').value.trim();var ms=searchMatches(sq);if(ms.length)pickSearch(ms[0].id);}
+function openSearch(){closeDet();var s=document.getElementById('srch');if(s){setTimeout(function(){s.focus();s.select();},150);}}
+document.addEventListener('click',function(e){var w=document.getElementById('srchwrap');if(w&&!w.contains(e.target)){var dd=document.getElementById('srchdrop');if(dd)dd.style.display='none';}});
 
 /* ---------- AI (키는 실행 시 입력) ---------- */
 var LASTAI={};
@@ -669,10 +691,10 @@ function showDet(c,keep){
     +(c.gb?'<br><span style="color:#777">근거: '+esc(c.gb)+'</span>':'')
     +(c.xv?'<br><span style="color:#c62828">교차검증: '+esc(c.xv)+'</span>':'')
     +'<div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap"><button class="qbtn" style="background:'+(okd?'#2e7d32;color:#fff;border-color:#2e7d32':'#fff')+'" onclick="confirmBiz(\''+id+'\')">'+(okd?'✅ 현장확인 취소':'✅ 명함으로 주소·번호 확인함')+'</button><span style="font-size:10px;color:#999;align-self:center">기준: '+(c.ad?esc(c.ad.slice(0,22))+'… ':'')+(c.bz?esc(c.bz):'번호 없음')+'</span></div></div>';
-  var awBadge=c.aw?'<span class="bg" style="background:#8d6e00">🏆 2026 AWARDS</span>':'';
+  var awBadge=(c.aw?'<span class="bg" style="background:#8d6e00">🏆 2026 AWARDS</span>':'')+(isVis(c.id)?'<span class="bg" style="background:#2e7d32">✓ 방문 '+esc((STATE.v[c.id]||{}).t||'')+'</span>':'');
   var venB=(c.ven||[]).map(function(v){return '<span class="bg" style="background:#00897b">'+esc(v)+'</span>';}).join('');
   var h='<div class="detback"><span class="bk" onclick="closeDet()">← 지도</span><span class="ttl" onclick="closeDet()"><b>'+(c.b||'미확인')+'</b>'+esc(shortName(c.n)||c.n)+'</span>'
-    +'<span class="mini"><button class="'+(vis?'done':'')+'" onclick="toggleVis(\''+id+'\')">'+(vis?'✓방문':'방문')+'</button><button class="'+(card?'cdone':'')+'" onclick="toggleCard(\''+id+'\')">🪪</button></span></div>'
+    +'<span class="mini"><button onclick="openSearch()" title="부스·업체 찾기">🔍</button><button class="'+(vis?'done':'')+'" onclick="toggleVis(\''+id+'\')">'+(vis?'✓방문':'방문')+'</button><button class="'+(card?'cdone':'')+'" onclick="toggleCard(\''+id+'\')">🪪</button></span></div>'
     +'<div class="dh"><div class="dh-top"><div><div class="bno">'+(c.b||'<span style="font-size:14px;color:#bbb">부스 미확인</span>')+'</div>'
     +'<div class="cnm">'+esc(c.n)+'</div>'+(c.en?'<div class="cen">'+esc(c.en)+'</div>':'')+'</div></div>'
     +'<div class="badges">'+tierBadge+gBadge+awBadge+venB+'</div>'+exPanel
