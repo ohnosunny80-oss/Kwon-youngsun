@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="color-scheme" content="light only">
 <title>2026 한국건설·안전박람회 상담앱</title>
+<meta name="theme-color" content="#1B2A5C">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:#12203a}
@@ -113,12 +114,18 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#12
 .catchip{flex:none;font-size:12px;font-weight:600;padding:7px 13px;border-radius:99px;border:1.5px solid #ccd;background:#fff;color:#555;cursor:pointer;white-space:nowrap}
 .catchip.on{background:#1B2A5C;color:#fff;border-color:#1B2A5C}
 .bigbtn{width:100%;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px}
-@media(min-width:1100px){
+@media(min-width:1281px){
  #det{width:clamp(480px,36vw,760px);zoom:1.12}
  #det .dh h2{font-size:22px}
  .leg{font-size:12px}
 }
-@media(max-width:768px){
+@media(min-width:769px) and (max-width:1280px){
+ #det>*{max-width:900px;width:100%;margin-left:auto;margin-right:auto;box-sizing:border-box}
+ #det{font-size:14px;zoom:1.08}
+ .detback{max-width:none}
+ .fb{font-size:13px;padding:6px 13px}
+}
+@media(max-width:1280px){
  .zoombar #zoomhint{display:none}
  #top{padding:5px 8px;gap:5px}
  #top h1{font-size:13px}
@@ -828,7 +835,7 @@ function showDet(c,keep){
     +'<div style="font-size:10px;color:#999">변환된 텍스트는 위 📝 현장 메모 칸에 들어갑니다</div>'
     +'</div>';
   det.innerHTML=h;
-  if(window.innerWidth<=768){openSheet();if(!keep)det.scrollTop=0;}else if(!keep)det.scrollTop=0;
+  if(window.innerWidth<=1280){openSheet();if(!keep)det.scrollTop=0;}else if(!keep)det.scrollTop=0;
 }
 /* ---------- whisper ---------- */
 var mediaRec=null,isRec=false;
