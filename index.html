@@ -13,11 +13,11 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#12
 #top{position:fixed;top:0;left:0;right:0;min-height:50px;background:#1B2A5C;display:flex;align-items:center;gap:8px;padding:6px 12px;z-index:999;flex-wrap:wrap}
 #top h1{font-size:14px;font-weight:800;color:#fff;white-space:nowrap}
 #me{font-size:12px;font-weight:700;color:#fff;background:rgba(255,255,255,.16);padding:3px 9px;border-radius:6px}
-#srchdrop{display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:#fff;color:#111;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.35);max-height:60vh;overflow-y:auto;z-index:2000}
-#srchdrop .sr{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:13px}
-#srchdrop .sr b{font-size:14px;color:#1B2A5C;min-width:46px}
-#srchdrop .sr .dot{width:12px;height:12px;border-radius:50%;flex:none}
-#srchdrop .sr small{color:#888;margin-left:auto;white-space:nowrap}
+#srchdrop,.sdrop{display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:#fff;color:#111;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.35);max-height:60vh;overflow-y:auto;z-index:2000}
+#srchdrop .sr,.sdrop .sr{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:13px}
+#srchdrop .sr b,.sdrop .sr b{font-size:14px;color:#1B2A5C;min-width:46px}
+#srchdrop .sr .dot,.sdrop .sr .dot{width:12px;height:12px;border-radius:50%;flex:none}
+#srchdrop .sr small,.sdrop .sr small{color:#888;margin-left:auto;white-space:nowrap}
 #srch{padding:5px 10px;border-radius:6px;border:none;font-size:13px;width:220px;outline:none;background:rgba(255,255,255,.16);color:#fff;font-family:inherit}
 #srch::placeholder{color:rgba(255,255,255,.55)}
 .fbar{display:flex;gap:4px;flex-wrap:wrap}
@@ -98,7 +98,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#12
 .zoombar button{min-width:36px;height:32px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.14);color:#fff;border-radius:7px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit}
 .zoombar button:active{background:#fff;color:#1B2A5C}
 .zoombar #zoomhint{font-size:10px;color:#9fb0d0;margin-left:2px}
-#bin{width:84px;height:32px;border-radius:7px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.14);color:#fff;font-size:13px;font-weight:700;padding:0 8px;outline:none;font-family:inherit;text-transform:uppercase}
+#bin{width:100%;height:32px;border-radius:7px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.14);color:#fff;font-size:13px;font-weight:700;padding:0 8px;outline:none;font-family:inherit;text-transform:uppercase}
 #bin::placeholder{color:rgba(255,255,255,.5);font-weight:400;font-size:11px}
 #listView.on{display:flex;flex-direction:column;overflow-y:auto;background:#f4f4f6;padding:12px;width:100%;height:100%}
 #listInner{max-width:760px;margin:0 auto;width:100%;padding-bottom:40px}
@@ -205,8 +205,8 @@ details.sec:not([open]) summary::after{content:'▸'}
         <button onclick="zBtn(-1)">－</button>
         <button onclick="stageFit('all')" style="width:auto;padding:0 12px;font-size:13px">전체보기</button>
         <button onclick="zBtn(1)">＋</button>
-        <input id="bin" placeholder="부스번호" maxlength="4" onkeydown="if(event.key==='Enter')goBooth()">
-        <button onclick="goBooth()" style="width:auto;padding:0 10px;font-size:12px">이동</button>
+        <span id="binwrap" style="position:relative;display:inline-flex;flex:1;min-width:120px;max-width:380px"><input id="bin" placeholder="🔍 부스번호·업체명 (I086, 메이사)" oninput="onSearch('bin')" onfocus="onSearch('bin')" onkeydown="if(event.key==='Enter')searchGo('bin')" autocomplete="off"><div id="bindrop" class="sdrop"></div></span>
+        <button onclick="searchGo('bin')" style="width:auto;padding:0 10px;font-size:12px">이동</button>
         <span id="zoomhint">✌️ 두 손가락으로 확대·축소 · 끌어서 이동 · 부스 탭하면 상세</span>
       </div>
       <div class="leg">
@@ -470,21 +470,23 @@ function searchMatches(sq){
   for(var i=0;i<CO.length&&out.length<12;i++){var c=CO[i];if(out.indexOf(c)<0&&matchQ(c,sq.toLowerCase()))out.push(c);}
   return out;
 }
-function onSearch(){
-  var sq=document.getElementById('srch').value.trim();
-  var dd=document.getElementById('srchdrop');
-  rebuildMaps();
-  if(document.getElementById('listView').classList.contains('on'))renderList();
+function _sIn(src){return document.getElementById(src==='bin'?'bin':'srch');}
+function _sDrop(src){return document.getElementById(src==='bin'?'bindrop':'srchdrop');}
+function onSearch(src){
+  src=src||'srch';
+  var sq=_sIn(src).value.trim();
+  var dd=_sDrop(src);
+  if(src!=='bin'){rebuildMaps();if(document.getElementById('listView').classList.contains('on'))renderList();}
   if(!sq){dd.style.display='none';dd.innerHTML='';return;}
   var ms=searchMatches(sq);
   if(!ms.length){dd.innerHTML='<div class="sr" style="color:#999">일치하는 업체·부스 없음</div>';dd.style.display='block';return;}
-  dd.innerHTML=ms.map(function(c){return '<div class="sr" onclick="pickSearch(\''+c.id+'\')"><span class="dot" style="background:'+fillOf(c)+'"></span><b>'+esc(c.b||'미확인')+'</b><span>'+esc(c.n)+(isVis(c.id)?' <span style="color:#2e7d32;font-weight:700">✓방문</span>':'')+'</span><small>'+(c.t?TN[c.t]:'')+'</small></div>';}).join('');
+  dd.innerHTML=ms.map(function(c){return '<div class="sr" onclick="pickSearch(\''+c.id+'\',\''+src+'\')"><span class="dot" style="background:'+fillOf(c)+'"></span><b>'+esc(c.b||'미확인')+'</b><span>'+esc(c.n)+(isVis(c.id)?' <span style="color:#2e7d32;font-weight:700">✓방문</span>':'')+'</span><small>'+(c.t?TN[c.t]:'')+'</small></div>';}).join('');
   dd.style.display='block';
 }
-function pickSearch(id){var dd=document.getElementById('srchdrop');dd.style.display='none';var s=document.getElementById('srch');s.value='';s.blur();openBooth(id);}
-function searchGo(){var sq=document.getElementById('srch').value.trim();var ms=searchMatches(sq);if(ms.length)pickSearch(ms[0].id);}
-function openSearch(){closeDet();var s=document.getElementById('srch');if(s){setTimeout(function(){s.focus();s.select();},150);}}
-document.addEventListener('click',function(e){var w=document.getElementById('srchwrap');if(w&&!w.contains(e.target)){var dd=document.getElementById('srchdrop');if(dd)dd.style.display='none';}});
+function pickSearch(id,src){src=src||'srch';var dd=_sDrop(src);dd.style.display='none';var s=_sIn(src);s.value='';s.blur();if(src==='bin'){document.getElementById('srch').value='';}openBooth(id);}
+function searchGo(src){src=src||'srch';var sq=_sIn(src).value.trim();var ms=searchMatches(sq);if(ms.length)pickSearch(ms[0].id,src);else if(src==='bin')goBooth();}
+function openSearch(){closeDet();var s=document.getElementById('bin')||document.getElementById('srch');if(s){setTimeout(function(){s.focus();s.select();},150);}}
+document.addEventListener('click',function(e){['srchwrap','binwrap'].forEach(function(id,i){var w=document.getElementById(id);if(w&&!w.contains(e.target)){var dd=document.getElementById(i?'bindrop':'srchdrop');if(dd)dd.style.display='none';}});});
 
 /* ---------- AI (키는 실행 시 입력) ---------- */
 var LASTAI={};
